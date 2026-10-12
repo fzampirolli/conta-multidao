@@ -8,7 +8,8 @@ import { criarCamadasBase } from "./camadas.js";
 
 const $ = (id) => document.getElementById(id);
 let mapa, camadaPares, camadaMosaico = null, marcadorCursor = null, local = null;
-let fotoAtual = null, pendente = null, esc = 1, zoom = 1;
+let fotoAtual = null, esc = 1, zoom = 1;
+let pendentes = []; // pontos clicados na foto à espera do clique no mapa (Ctrl + clique enfileira vários)
 let previsto = null, arrasto = null, ignorarClique = false; // marcador de prévia no mapa; par arrastado na foto
 let desfeitos = {}; // pares removidos por foto, para Refazer
 const cv = () => $("proj-canvas");
@@ -49,7 +50,7 @@ function desenharFoto() {
   g.drawImage(img, 0, 0, c.width, c.height);
   const gr = geo(fotoAtual);
   gr.pares.forEach((p, i) => marca(g, p.foto, i + 1, gr.residuos?.[i]));
-  if (pendente) marca(g, pendente, gr.pares.length + 1, null, true);
+  pendentes.forEach((p, k) => marca(g, p, gr.pares.length + 1 + k, null, true));
 }
 function marca(g, [x, y], n, res, pend = false) {
   const X = x * esc, Y = y * esc;
@@ -261,37 +262,49 @@ function mostrarMosaicoNoMapa() {
 function cliqueFoto(e) {
   if (!fotoAtual) return;
   if (ignorarClique) { ignorarClique = false; return; } // fim de um arrasto, não um clique
-  pendente = pontoDoMouse(e);
-  const gr = geo(fotoAtual), ll = gr.H && paraChao(gr, pendente);
-  if (ll) {
-    // Prévia: marcador rosa onde o ponto deve estar. Arraste-o e tecle Enter, ou clique no lugar certo.
-    mapa.setView(ll, Math.max(mapa.getZoom(), 19));
-    previsto ||= L.marker(ll, { icon: iconePar("prevista"), draggable: true, title: "Arraste até o ponto certo e tecle Enter", zIndexOffset: 1000 });
-    previsto.setLatLng(ll).addTo(mapa);
-    dica(`Par ${gr.pares.length + 1}: o marcador rosa mostra onde o ponto deve estar. Arraste-o até o lugar exato e tecle Enter, ou clique no lugar certo do mapa. Esc cancela.`);
-  } else dica(`Agora clique no MESMO ponto no mapa (par ${gr.pares.length + 1}). Esc cancela.`);
+  const p = pontoDoMouse(e);
+  // Ctrl + clique: modo lote. Enfileira vários pontos na foto; depois cada clique no mapa completa o primeiro da fila.
+  if (e.ctrlKey || e.metaKey) pendentes.push(p); else pendentes = [p];
+  mostrarProximo(true);
   desenharFoto();
 }
+/** Prévia (marcador rosa) e dica para o primeiro ponto da fila. */
+function mostrarProximo(mover) {
+  const gr = geo(fotoAtual);
+  if (!pendentes.length) { if (previsto) mapa.removeLayer(previsto); return; }
+  const n = gr.pares.length + 1, resto = pendentes.length > 1 ? ` Na fila: ${pendentes.length} pontos (${n} a ${n + pendentes.length - 1}), clique no mapa na mesma ordem.` : "";
+  const ll = gr.H && paraChao(gr, pendentes[0]);
+  if (ll) {
+    if (!mover || pendentes.length === 1) mapa.setView(ll, Math.max(mapa.getZoom(), 19));
+    previsto ||= L.marker(ll, { icon: iconePar("prevista"), draggable: true, title: "Arraste até o ponto certo e tecle Enter", zIndexOffset: 1000 });
+    previsto.setLatLng(ll).addTo(mapa);
+    dica(`Par ${n}: o marcador rosa mostra onde o ponto deve estar. Arraste-o e tecle Enter, ou clique no lugar certo do mapa.${resto} Esc cancela.`);
+  } else {
+    if (previsto) mapa.removeLayer(previsto);
+    dica(`Agora clique no MESMO ponto no mapa (par ${n}).${resto} Esc cancela.`);
+  }
+}
 function cancelarPendente() {
-  pendente = null;
+  pendentes = [];
   if (previsto) mapa.removeLayer(previsto);
 }
 function confirmarPar(latlng) {
-  const gr = geo(fotoAtual);
-  gr.pares.push({ foto: pendente.map((v) => +v.toFixed(1)), mapa: [+latlng.lat.toFixed(7), +latlng.lng.toFixed(7)] });
+  const gr = geo(fotoAtual), p = pendentes.shift();
+  gr.pares.push({ foto: p.map((v) => +v.toFixed(1)), mapa: [+latlng.lat.toFixed(7), +latlng.lng.toFixed(7)] });
   desfeitos[fotoAtual.hash] = []; // um par novo encerra a sequência de Refazer
-  cancelarPendente();
-  dica(gr.pares.length < 4 ? `Par salvo. Marque mais ${4 - gr.pares.length}.` : "Par salvo. Clique no próximo ponto na foto. Para corrigir um par, arraste o marcador na foto ou no mapa.");
   parAlterado(gr);
+  if (pendentes.length) { mostrarProximo(false); return; }
+  if (previsto) mapa.removeLayer(previsto);
+  dica(gr.pares.length < 4 ? `Par salvo. Marque mais ${4 - gr.pares.length}.` : "Par salvo. Clique no próximo ponto na foto (Ctrl + clique para marcar vários de uma vez). Para corrigir um par, arraste o marcador.");
 }
 function cliqueMapa(e) {
   if (!fotoAtual) return;
-  if (!pendente) { dica("Primeiro clique no ponto na FOTO, depois no mapa."); return; }
+  if (!pendentes.length) { dica("Primeiro clique no ponto na FOTO, depois no mapa."); return; }
   confirmarPar(e.latlng);
 }
 function desfazer() {
   if (!fotoAtual) return;
-  if (pendente) { cancelarPendente(); desenharFoto(); return; }
+  if (pendentes.length) { pendentes.pop(); mostrarProximo(false); desenharFoto(); return; } // primeiro tira da fila
   const g = geo(fotoAtual);
   if (!g.pares.length) return;
   (desfeitos[fotoAtual.hash] ||= []).push(g.pares.pop());
@@ -317,13 +330,13 @@ function parSobMouse(e) {
   return melhor;
 }
 function apertarFoto(e) {
-  if (e.button !== 0 || pendente) return;
+  if (e.button !== 0 || pendentes.length || e.ctrlKey || e.metaKey) return;
   const i = parSobMouse(e);
   if (i < 0) return;
   arrasto = i; ignorarClique = true; e.preventDefault();
 }
 function arrastarFoto(e) {
-  if (arrasto == null) { cv().style.cursor = parSobMouse(e) >= 0 && !pendente ? "move" : ""; return; }
+  if (arrasto == null) { cv().style.cursor = parSobMouse(e) >= 0 && !pendentes.length && !e.ctrlKey ? "move" : ""; return; }
   const p = pontoDoMouse(e), { largura: W, altura: H } = fotoAtual;
   geo(fotoAtual).pares[arrasto].foto = [+Math.min(W, Math.max(0, p[0])).toFixed(1), +Math.min(H, Math.max(0, p[1])).toFixed(1)];
   desenharFoto();
@@ -336,8 +349,8 @@ function soltarFoto() {
 function teclas(e) {
   if (!$("painel-projecao").classList.contains("ativo") || !fotoAtual) return;
   if (["INPUT", "SELECT", "TEXTAREA"].includes(e.target.tagName)) return;
-  if (e.key === "Escape" && pendente) { cancelarPendente(); desenharFoto(); dica("Ponto cancelado."); }
-  else if (e.key === "Enter" && pendente && previsto && mapa.hasLayer(previsto)) { e.preventDefault(); confirmarPar(previsto.getLatLng()); }
+  if (e.key === "Escape" && pendentes.length) { cancelarPendente(); desenharFoto(); dica("Pontos pendentes cancelados."); }
+  else if (e.key === "Enter" && pendentes.length && previsto && mapa.hasLayer(previsto)) { e.preventDefault(); confirmarPar(previsto.getLatLng()); }
   else if ((e.ctrlKey || e.metaKey) && (e.key.toLowerCase() === "y" || (e.shiftKey && e.key.toLowerCase() === "z"))) { e.preventDefault(); refazer(); }
   else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "z") { e.preventDefault(); desfazer(); }
   else if (e.key === "Backspace" || e.key === "Delete") { e.preventDefault(); if (!e.repeat) desfazer(); } // segurar a tecla não apaga tudo
