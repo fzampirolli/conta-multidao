@@ -75,6 +75,8 @@
       <button data-etapa="resultado">Resultado</button>
       <label class="largura" title="Largura das áreas de trabalho, em todas as abas">Largura:
         <select id="largura-trabalho"><option value="normal">normal</option><option value="larga">larga</option><option value="janela">janela inteira</option></select></label>
+      <label class="largura" style="margin-left:0" title="Altura das áreas de imagem e mapa, em todas as abas">Altura:
+        <select id="altura-trabalho"><option value="baixa">baixa</option><option value="media">média</option><option value="alta">alta</option></select></label>
     </nav>
 
     <!-- 1. FOTOS -->
@@ -165,7 +167,7 @@
         <p class="pequeno suave">Atalhos: roda do mouse amplia a foto · arraste um ponto (na foto ou no mapa) para corrigi-lo ·
           <kbd>Ctrl</kbd> + clique marca vários pontos na foto de uma vez (depois clique no mapa na mesma ordem) ·
           <kbd>Enter</kbd> confirma o marcador rosa · <kbd>Esc</kbd> cancela os pontos pendentes · <kbd>Backspace</kbd> ou <kbd>Ctrl+Z</kbd> desfaz o último par · <kbd>Ctrl+Y</kbd> refaz</p>
-        <div class="grade-projecao" data-divisivel="projecao" data-padrao="0.6">
+        <div class="grade-projecao" data-divisivel="projecao" data-padrao="0.6" data-altura="projecao">
           <div class="area-trabalho vazia" id="proj-area"><canvas id="proj-canvas" width="10" height="10"></canvas></div>
           <div id="proj-mapa"></div>
         </div>
@@ -210,7 +212,7 @@
             <button id="fechar-zona" class="primario">Concluir zona</button>
             <button id="desfazer-ponto">Desfazer ponto</button>
           </div>
-          <div id="mapa"></div>
+          <div id="mapa" data-altura="area"></div>
           <p class="suave pequeno">Clique no mapa para marcar pontos. Divida o evento em <b>zonas</b> de densidade parecida:
             perto do palco a multidão costuma ser mais densa que nas pontas.</p>
         </div>
@@ -257,7 +259,7 @@
         </div>
         <div class="progresso"><div id="den-prog"></div></div>
         <div class="duas-colunas" data-divisivel="densidade" data-padrao="0.68">
-          <div class="area-trabalho vazia" id="den-area"><canvas id="den-canvas" width="10" height="10"></canvas></div>
+          <div class="area-trabalho vazia" id="den-area" data-altura="densidade"><canvas id="den-canvas" width="10" height="10"></canvas></div>
           <div>
             <div class="kpis" style="grid-template-columns:1fr 1fr">
               <div class="kpi"><div class="v" id="k-area">—</div><div class="r">área da amostra (m²)</div></div>

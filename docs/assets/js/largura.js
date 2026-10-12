@@ -1,7 +1,8 @@
-// Padrão de largura das áreas de trabalho, igual em todas as abas:
-//  1. seletor global (Normal, Larga, Janela inteira), que muda a largura máxima da página;
-//  2. divisor arrastável entre as duas colunas (imagem | mapa ou painel) de cada aba que tem duas colunas.
-// Tudo fica salvo no navegador. Duplo clique no divisor volta à proporção padrão.
+// Padrão de tamanho das áreas de trabalho, igual em todas as abas:
+//  1. seletores globais de Largura (normal, larga, janela inteira) e Altura (baixa, média, alta);
+//  2. divisor arrastável entre as duas colunas (imagem | mapa ou painel) das abas com duas colunas;
+//  3. alça arrastável embaixo de cada área de imagem ou mapa, para mudar só a altura dela.
+// Tudo fica salvo no navegador. Duplo clique no divisor ou na alça volta ao padrão.
 const CHAVE = "conta-multidao-layout";
 let salvo = {};
 try { salvo = JSON.parse(localStorage.getItem(CHAVE) || "{}"); } catch {}
@@ -41,10 +42,41 @@ function divisivel(el) {
   div.addEventListener("dblclick", () => { delete salvo[id]; guardar(); por(padrao); avisarRedimensionar(); });
 }
 
+function ajustavelEmAltura(el) {
+  const id = "h:" + el.dataset.altura;
+  const alca = document.createElement("div");
+  alca.className = "alca-altura";
+  alca.title = "Arraste para ajustar a altura desta área · duplo clique volta à altura geral";
+  alca.setAttribute("role", "separator");
+  el.after(alca);
+  const por = (px) => (px ? el.style.setProperty("--h", `${Math.round(px)}px`) : el.style.removeProperty("--h"));
+  por(salvo[id]);
+  alca.addEventListener("pointerdown", (e) => {
+    e.preventDefault();
+    alca.setPointerCapture(e.pointerId); alca.classList.add("ativo");
+    // a altura atual da área (no caso de duas colunas, a da primeira)
+    const alvo = el.children.length && !el.matches("#mapa, .area-trabalho") ? el.children[0] : el;
+    const y0 = e.clientY, h0 = alvo.getBoundingClientRect().height;
+    const mover = (ev) => { por(Math.min(3000, Math.max(250, h0 + ev.clientY - y0))); avisarRedimensionar(); };
+    const soltar = () => {
+      alca.classList.remove("ativo");
+      alca.removeEventListener("pointermove", mover); alca.removeEventListener("pointerup", soltar);
+      salvo[id] = parseFloat(el.style.getPropertyValue("--h")) || undefined; guardar(); avisarRedimensionar();
+    };
+    alca.addEventListener("pointermove", mover); alca.addEventListener("pointerup", soltar);
+  });
+  alca.addEventListener("dblclick", () => { delete salvo[id]; guardar(); por(null); avisarRedimensionar(); });
+}
+
 export function iniciarLargura() {
   const sel = document.getElementById("largura-trabalho");
   const aplicar = (v) => { document.documentElement.dataset.largura = v; sel.value = v; avisarRedimensionar(); };
   aplicar(salvo.largura || "larga");
   sel.onchange = () => { salvo.largura = sel.value; guardar(); aplicar(sel.value); };
+  const selA = document.getElementById("altura-trabalho");
+  const aplicarA = (v) => { document.documentElement.dataset.alturaGeral = v; selA.value = v; avisarRedimensionar(); };
+  aplicarA(salvo.altura || "alta");
+  selA.onchange = () => { salvo.altura = selA.value; guardar(); aplicarA(selA.value); };
   document.querySelectorAll("[data-divisivel]").forEach(divisivel);
+  document.querySelectorAll("[data-altura]").forEach(ajustavelEmAltura);
 }

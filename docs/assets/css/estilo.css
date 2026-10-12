@@ -135,7 +135,7 @@ input[type=number], input[type=text], select {
 input[type=text] { width: 16em; }
 input[type=range] { accent-color: var(--acento); }
 
-#mapa { height: 520px; border-radius: 10px; border: 1px solid var(--borda); }
+#mapa { height: var(--h, var(--altura-global)); min-height: 250px; border-radius: 10px; border: 1px solid var(--borda); }
 .leaflet-container { font: inherit; }
 
 /* ---------- Tabelas ---------- */
@@ -185,7 +185,7 @@ footer .conteudo { max-width: 1180px; margin: auto; }
 #lista-zonas select { margin: .2rem 0; }
 
 .grade-projecao { display: grid; gap: .8rem; }
-.grade-projecao .area-trabalho, #proj-mapa { height: calc(100vh - 160px); min-height: 420px; max-height: none; }
+.grade-projecao .area-trabalho, #proj-mapa { height: var(--h, var(--altura-global)); min-height: 250px; max-height: none; }
 .grade-projecao .area-trabalho { display: flex; }
 .grade-projecao .area-trabalho canvas { margin: auto; } /* centraliza sem cortar quando há zoom */
 #proj-trabalho:fullscreen { background: var(--fundo); padding: .6rem; display: flex; flex-direction: column; }
@@ -218,3 +218,16 @@ kbd { font: .8em ui-monospace, monospace; border: 1px solid var(--borda); border
   background: var(--cartao); border: 1px solid var(--borda); border-radius: 4px; padding: .3rem 0; line-height: 1; }
 .divisor:hover, .divisor.ativo { background: linear-gradient(var(--acento), var(--acento)) center / 4px 100% no-repeat; }
 @media (max-width: 900px) { [data-divisivel] { grid-template-columns: 1fr; gap: 1rem; } .divisor { display: none; } }
+
+/* ---------- Padrão de altura (todas as abas) ----------
+   --altura-global vem do seletor "Altura"; --h, posto pela alça embaixo de cada área, vale só para ela. */
+:root { --altura-global: calc(100vh - 160px); }
+:root[data-altura-geral="baixa"] { --altura-global: 50vh; }
+:root[data-altura-geral="media"] { --altura-global: 70vh; }
+#den-area:not(.vazia) { height: var(--h, var(--altura-global)); min-height: 250px; max-height: none; }
+.alca-altura { height: 12px; margin: .3rem 0 .2rem; cursor: row-resize; touch-action: none; border-radius: 5px; position: relative;
+  background: linear-gradient(var(--borda), var(--borda)) center / 100% 2px no-repeat; }
+.alca-altura::after { content: "⋯"; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); line-height: 1;
+  color: var(--suave); background: var(--cartao); border: 1px solid var(--borda); border-radius: 4px; padding: 0 .5rem; }
+.alca-altura:hover, .alca-altura.ativo { background: linear-gradient(var(--acento), var(--acento)) center / 100% 4px no-repeat; }
+#proj-trabalho:fullscreen .alca-altura { display: none; }
