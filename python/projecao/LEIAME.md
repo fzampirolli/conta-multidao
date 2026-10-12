@@ -9,6 +9,9 @@ Scripts usados para calibrar as câmeras por **pontos de fuga**, porque a multid
    Gera a homografia foto → (s,t) e uma sobreposição de verificação.
 5. `grade_perspectiva.py foto camXX_H.json saida`: desenha meios-fios e ruas transversais na perspectiva da foto, para validar o modelo.
 6. `pares_controle.py`: gera pares (pixel ↔ lat/lon) para o site, incluindo as fotos que herdam o modelo pelo registro.
+   Os pontos ficam a até 10 m da linha central real da avenida (OSM) e onde a foto tem ≥ 4 px/m. São gerados pelo modelo, não clicados:
+   alguns podem cair sobre copas de árvores que escondem o chão (o ponto no mapa continua correto). `--reamostrar relatorio.json`
+   escolhe novos pontos sem mudar as homografias.
 
 Parâmetros e resultados estão em `dados/paulista-2026-10-11/` (`cam10.json`, `cam27.json`, `*_H.json`).
 Os caminhos dentro dos scripts apontam para uma pasta de trabalho; ajuste antes de rodar.
