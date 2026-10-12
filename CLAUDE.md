@@ -35,6 +35,14 @@ Histórico completo da conversa que criou o projeto: `notas/conversa-2026-10-12.
 - Testes: `cd docs && python3 -m http.server 8765` e Playwright no `.venv` (Chrome em `/usr/bin/google-chrome`).
 - Python: `.venv/` (lwcc, onnx, onnxruntime, playwright). O pacote lwcc tem um bug no caminho dos pesos (`/.lwcc`), corrigido localmente no venv.
 
+## Onde paramos (12/10/2026, noite)
+- Trabalho local do autor salvo em `dados/paulista-2026-10-11/trabalho-local-2026-10-12-18h24.json` (não publicado):
+  foto 55583249175 com 23 pares manuais (erro médio 6,7 m; vários sobre copas de árvores, par 2 com 19,8 m) e 2 medidas da régua.
+- Régua (📏 Medir, etapa 3): M1 foi traçada no telhado do MASP (inválida); M2, transversal e no chão, deu 14,9 m na ortofoto
+  contra 11,4 m no modelo publicado (−23%). Próximo passo: 4 ou 5 medidas transversais em distâncias diferentes para ver se o
+  modelo da vista 2 encolhe as distâncias. Se sim, corrigir a escala muda as áreas das amostras e a densidade do núcleo.
+- Publicado: estimativa 210–380 mil; foto 55583249175 com o modelo de câmera (pares manuais só como referência).
+
 ## Ideias pendentes
 - Transferir o repositório para uma organização ou domínio neutro (pedido do autor).
 - Fotos independentes (imprensa ou cidadãos, licença aberta) do trecho Augusta–Consolação.
