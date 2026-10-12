@@ -13,7 +13,8 @@
   "Relatos indicam multidões também nas ruas transversais à Paulista. Elas não estão nas zonas, portanto esta estimativa não as inclui e, nesse sentido, é conservadora.",
   "Versão anterior desta estimativa (12/10/2026, densidades só por julgamento visual): 140 mil a 280 mil pessoas, mediana ≈200 mil.",
   "Fotos: única fonte com licença aberta é o álbum oficial da campanha (possível viés de seleção de ângulo e horário).",
-  "Horários: o campo 'data' das fotos é a hora de edição/exportação no Lightroom (vários arquivos com 14:03:12), não a hora de captura."
+  "Horários: o campo 'data' das fotos é a hora de edição/exportação no Lightroom (vários arquivos com 14:03:12), não a hora de captura.",
+  "Foto 55583249175: a projeção publicada usa o modelo de câmera (largura do carro de som = 3,01 m). Pares marcados à mão ficam no relatório como referência (paresManuaisReferencia), mas distorcem a escala perto do caminhão (largura medida ≈5,0 m)."
  ],
  "fotos": [
   {
@@ -2226,21 +2227,61 @@
   },
   "e12f01be8ea969aeb7b4abf880725761db980dbb0fd2003ddced2add82c501aa": {
    "foto": "fotos/55583249175.jpg",
-   "metodo": "modelo de câmera por pontos de fuga (3 pares) + 13 pares marcados à mão sobre a ortofoto",
+   "metodo": "modelo de câmera por pontos de fuga",
    "pares": [
     {
      "foto": [
-      435.5,
-      1028.2
+      74.3,
+      1129.0
      ],
      "mapa": [
-      -23.5618611,
-      -46.6562198
+      -23.561868,
+      -46.6561312
      ]
     },
     {
      "foto": [
-      1074,
+      1140.6,
+      416.7
+     ],
+     "mapa": [
+      -23.5610425,
+      -46.6567702
+     ]
+    },
+    {
+     "foto": [
+      840.7,
+      1129.0
+     ],
+     "mapa": [
+      -23.5617622,
+      -46.6560348
+     ]
+    },
+    {
+     "foto": [
+      674.1,
+      641.6
+     ],
+     "mapa": [
+      -23.5616268,
+      -46.6563817
+     ]
+    },
+    {
+     "foto": [
+      440.8,
+      979.0
+     ],
+     "mapa": [
+      -23.5617959,
+      -46.6561475
+     ]
+    },
+    {
+     "foto": [
+      1074.0,
       810.3
      ],
      "mapa": [
@@ -2250,145 +2291,180 @@
     },
     {
      "foto": [
-      886.1,
-      462.4
+      874.0,
+      454.2
      ],
      "mapa": [
-      -23.5613399,
-      -46.6567972
+      -23.5613036,
+      -46.6567477
      ]
     },
     {
      "foto": [
-      548.8,
-      898.9
+      707.4,
+      904.0
      ],
      "mapa": [
-      -23.5618187,
-      -46.6562654
+      -23.5617333,
+      -46.6561443
      ]
     },
     {
      "foto": [
-      994.5,
-      1111.6
+      1074.0,
+      1054.0
      ],
      "mapa": [
-      -23.5617898,
-      -46.6560911
+      -23.5617129,
+      -46.656027
      ]
     },
     {
      "foto": [
-      375.7,
-      1125.5
+      607.5,
+      1129.0
      ],
      "mapa": [
-      -23.5618851,
-      -46.6561856
-     ]
-    },
-    {
-     "foto": [
-      74.3,
-      1129
-     ],
-     "mapa": [
-      -23.5618918,
-      -46.6561682
-     ]
-    },
-    {
-     "foto": [
-      1069.3,
-      434
-     ],
-     "mapa": [
-      -23.5611149,
-      -46.6568501
-     ]
-    },
-    {
-     "foto": [
-      840.7,
-      1129
-     ],
-     "mapa": [
-      -23.5618107,
-      -46.6560763
-     ]
-    },
-    {
-     "foto": [
-      739.7,
-      646.4
-     ],
-     "mapa": [
-      -23.5616632,
-      -46.6564371
-     ]
-    },
-    {
-     "foto": [
-      1260.4,
-      614.6
-     ],
-     "mapa": [
-      -23.5613335,
-      -46.6563576
-     ]
-    },
-    {
-     "foto": [
-      1236.3,
-      565.9
-     ],
-     "mapa": [
-      -23.5612443,
-      -46.656438
-     ]
-    },
-    {
-     "foto": [
-      1039.9,
-      581.9
-     ],
-     "mapa": [
-      -23.5614257,
-      -46.6565078
-     ]
-    },
-    {
-     "foto": [
-      1422,
-      1101.6
-     ],
-     "mapa": [
-      -23.5617158,
-      -46.6559787
-     ]
-    },
-    {
-     "foto": [
-      1235,
-      1089.6
-     ],
-     "mapa": [
-      -23.5617422,
-      -46.6559975
-     ]
-    },
-    {
-     "foto": [
-      1100.9,
-      240.1
-     ],
-     "mapa": [
-      -23.5573282,
-      -46.6612488
+      -23.5617943,
+      -46.656064
      ]
     }
-   ]
+   ],
+   "paresManuaisReferencia": {
+    "nota": "13 pares marcados à mão sobre a ortofoto (erro médio 3,1 m). Não usados: com eles, a largura do carro de som (3,00 m) mede ≈5,0 m, sinal de escala distorcida perto do caminhão.",
+    "pares": [
+     {
+      "foto": [
+       435.5,
+       1028.2
+      ],
+      "mapa": [
+       -23.5618611,
+       -46.6562198
+      ]
+     },
+     {
+      "foto": [
+       886.1,
+       462.4
+      ],
+      "mapa": [
+       -23.5613399,
+       -46.6567972
+      ]
+     },
+     {
+      "foto": [
+       548.8,
+       898.9
+      ],
+      "mapa": [
+       -23.5618187,
+       -46.6562654
+      ]
+     },
+     {
+      "foto": [
+       994.5,
+       1111.6
+      ],
+      "mapa": [
+       -23.5617898,
+       -46.6560911
+      ]
+     },
+     {
+      "foto": [
+       375.7,
+       1125.5
+      ],
+      "mapa": [
+       -23.5618826,
+       -46.6561823
+      ]
+     },
+     {
+      "foto": [
+       1069.3,
+       434
+      ],
+      "mapa": [
+       -23.5611149,
+       -46.6568501
+      ]
+     },
+     {
+      "foto": [
+       739.7,
+       646.4
+      ],
+      "mapa": [
+       -23.5616632,
+       -46.6564371
+      ]
+     },
+     {
+      "foto": [
+       1260.4,
+       614.6
+      ],
+      "mapa": [
+       -23.561354,
+       -46.6563794
+      ]
+     },
+     {
+      "foto": [
+       1236.3,
+       565.9
+      ],
+      "mapa": [
+       -23.5612679,
+       -46.6564786
+      ]
+     },
+     {
+      "foto": [
+       1041.7,
+       583.1
+      ],
+      "mapa": [
+       -23.5614257,
+       -46.6565078
+      ]
+     },
+     {
+      "foto": [
+       1422,
+       1101.6
+      ],
+      "mapa": [
+       -23.5617158,
+       -46.6559787
+      ]
+     },
+     {
+      "foto": [
+       1235,
+       1089.6
+      ],
+      "mapa": [
+       -23.5617422,
+       -46.6559975
+      ]
+     },
+     {
+      "foto": [
+       1100.9,
+       240.1
+      ],
+      "mapa": [
+       -23.5573282,
+       -46.6612488
+      ]
+     }
+    ]
+   }
   },
   "39049d9bab7437ac603555cbf092576fe27095189d8c43a2c61e253f03faf46b": {
    "foto": "fotos/55581805947.jpg",

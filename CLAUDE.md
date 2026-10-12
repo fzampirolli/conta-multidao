@@ -21,6 +21,8 @@ Histórico completo da conversa que criou o projeto: `notas/conversa-2026-10-12.
 - Única fonte com licença aberta: álbum Flickr "Lula Oficial" (CC BY-SA 4.0); viés de seleção declarado.
 - Horário de captura **desconhecido**: o EXIF só tem a hora de edição do Lightroom.
 - Vistas: 3 fotos para o Paraíso (55581805947, 55582830431, 55583249180) e 3 para a Consolação (55583249175, 55583639030, 55583675910).
+- Conferência de escala: a largura do carro de som (3,00 m) medida pela projeção. Pares manuais da 55583249175 deram ≈5,0 m
+  (escala distorcida perto do caminhão) e ficam só como referência (`paresManuaisReferencia`); a publicada usa o modelo.
 - Câmeras calibradas por pontos de fuga (`python/projecao/`, parâmetros em `dados/paulista-2026-10-11/`):
   vista 1 a ≈63 m de altura, ≈100 m antes do MASP; vista 2 a ≈18 m, na ponta SE do MASP.
 - Resultado publicado (revisão de 12/10/2026): de 210 mil a 380 mil pessoas (mediana ≈290 mil). Núcleo apoiado em contagem manual com a grade
