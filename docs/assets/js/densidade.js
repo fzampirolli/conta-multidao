@@ -210,7 +210,7 @@ function selecionar(f) {
   dica({
     ref: "Marque os 4 cantos de um retângulo de tamanho conhecido no chão, em ordem (sentido horário).",
     amostra: "Clique para marcar os vértices do trecho da amostra; clique no 1º ponto para fechar.",
-    cabecas: "Clique em cada cabeça dentro da amostra. Clique de novo numa marca para apagá-la. Use o zoom (+) para enxergar melhor.",
+    cabecas: "Clique em cada cabeça dentro da amostra. Clique de novo numa marca para apagá-la. Use a roda do mouse para aproximar ou afastar.",
     grade: H() ? "Clique no ponto da foto onde quer a grade de contagem (por exemplo, junto ao palanque). Ajuste a célula e o tamanho ao lado."
       : "Esta imagem ainda não tem escala: marque pares na etapa 3 (Projeção) ou o retângulo de referência (①).",
   }[f]);
@@ -345,10 +345,20 @@ export function iniciarDensidade() {
   const barra = $("den-limpar").parentElement;
   for (const [t, f] of [["−", 1 / 1.5], ["+", 1.5]]) {
     const b = document.createElement("button"); b.textContent = t; b.title = "Zoom";
-    b.onclick = () => { zoom = Math.max(0.5, Math.min(6, zoom * f)); desenhar(); };
+    b.onclick = () => { zoom = Math.max(1, Math.min(8, zoom * f)); desenhar(); };
     barra.insertBefore(b, $("den-limpar"));
   }
   window.addEventListener("resize", () => imgId && desenhar());
+  // Roda do mouse: aproxima ou afasta mantendo fixo o ponto sob o cursor
+  cv.addEventListener("wheel", (e) => {
+    if (!imgId) return;
+    e.preventDefault();
+    const area = $("den-area"), p = pontoDoClique(e), r = area.getBoundingClientRect();
+    zoom = Math.max(1, Math.min(8, zoom * (e.deltaY < 0 ? 1.25 : 0.8)));
+    desenhar();
+    area.scrollLeft = cv.offsetLeft + p[0] * esc - (e.clientX - r.left);
+    area.scrollTop = cv.offsetTop + p[1] * esc - (e.clientY - r.top);
+  }, { passive: false });
   listar();
   return { redesenhar: desenhar };
 }

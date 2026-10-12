@@ -124,7 +124,9 @@ button.ativo { background: var(--acento-claro); border-color: var(--acento); col
 .miniatura.ref { outline: 3px solid var(--acento); }
 
 /* ---------- Canvas de trabalho ---------- */
-.area-trabalho { position: relative; background: #0b0f14; border-radius: 10px; overflow: auto; max-height: 75vh; }
+.area-trabalho { position: relative; background: #0b0f14; border-radius: 10px; overflow: auto; max-height: 75vh; overflow-anchor: none; }
+/* overflow-anchor: none impede o navegador de rolar a página ao redimensionar a imagem com o zoom */
+html { overflow-anchor: none; }
 .area-trabalho canvas { display: block; cursor: crosshair; max-width: none; }
 .barra { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; margin-bottom: .6rem; }
 .barra label { font-size: .9rem; color: var(--suave); }
