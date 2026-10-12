@@ -246,9 +246,11 @@ function mostrarMosaicoNoMapa() {
 // ---------- Interação ----------
 function cliqueFoto(e) {
   if (!fotoAtual) return;
-  const r = cv().getBoundingClientRect();
-  pendente = [((e.clientX - r.left) * (cv().width / r.width)) / esc, ((e.clientY - r.top) * (cv().height / r.height)) / esc];
+  pendente = pontoDoMouse(e);
   dica(`Agora clique no MESMO ponto no mapa (par ${geo(fotoAtual).pares.length + 1}).`);
+  // Com homografia, o mapa vai até onde o ponto deve estar, já com zoom para o clique
+  const gr = geo(fotoAtual), ll = gr.H && paraChao(gr, pendente);
+  if (ll) mapa.setView(ll, Math.max(mapa.getZoom(), 19));
   desenharFoto();
 }
 function cliqueMapa(e) {
@@ -260,28 +262,64 @@ function cliqueMapa(e) {
   dica(gr.pares.length < 4 ? `Par salvo. Marque mais ${4 - gr.pares.length}.` : "Par salvo. Passe o mouse sobre a foto para conferir onde cada ponto cai no mapa.");
   desenharFoto(); desenharMapa(); avisar("georef");
 }
+/** Ponto da foto → lat/lon no chão, ou null se cair atrás da câmera (acima do horizonte) ou longe demais. */
+function paraChao(gr, p) {
+  const H = gr.H, w = H[6] * p[0] + H[7] * p[1] + H[8];
+  const q = gr.pares[0].foto, w0 = H[6] * q[0] + H[7] * q[1] + H[8]; // os pares estão no chão: definem o lado certo
+  if (!(w * w0 > 0)) return null;
+  const ll = sistema().paraLatLon(aplicarH(H, p));
+  return isFinite(ll[0]) && Math.abs(ll[0] - sistema().origem[0]) < 0.05 ? ll : null;
+}
+/** Pixels da foto por metro de chão no ponto p (inverso da raiz do jacobiano da homografia). */
+function pxPorMetro(H, [x, y]) {
+  const w = H[6] * x + H[7] * y + H[8];
+  const det = H[0] * (H[4] * H[8] - H[5] * H[7]) - H[1] * (H[3] * H[8] - H[5] * H[6]) + H[2] * (H[3] * H[7] - H[4] * H[6]);
+  return Math.sqrt(Math.abs(w ** 3 / det));
+}
+const pontoDoMouse = (e) => {
+  const r = cv().getBoundingClientRect();
+  return [((e.clientX - r.left) * (cv().width / r.width)) / esc, ((e.clientY - r.top) * (cv().height / r.height)) / esc];
+};
+
 function moverFoto(e) {
   const gr = fotoAtual && geo(fotoAtual);
   if (!gr?.H) return;
-  const r = cv().getBoundingClientRect();
-  const p = [((e.clientX - r.left) * (cv().width / r.width)) / esc, ((e.clientY - r.top) * (cv().height / r.height)) / esc];
-  const w = gr.H[6] * p[0] + gr.H[7] * p[1] + gr.H[8];
-  const ll = sistema().paraLatLon(aplicarH(gr.H, p));
-  if (!isFinite(ll[0]) || Math.abs(ll[0] - sistema().origem[0]) > 0.05) return;
+  const ll = paraChao(gr, pontoDoMouse(e));
+  if (!ll) return;
   marcadorCursor ||= L.circleMarker(ll, { radius: 7, color: "#e0245e", weight: 3, fill: false }).addTo(mapa);
   marcadorCursor.setLatLng(ll);
+  if (!mapa.getBounds().pad(-0.1).contains(ll)) mapa.panTo(ll); // o mapa acompanha o mouse
+}
+
+/**
+ * Enquadra no mapa o chão que a foto mostra com detalhe (≥ 3 px/m), em vez da avenida inteira.
+ * Sem homografia, enquadra os pares já marcados.
+ */
+function enquadrar() {
+  const gr = fotoAtual && geo(fotoAtual);
+  if (!gr?.pares.length || !mapa.getSize().x) return;
+  let pts = [];
+  if (gr.H) {
+    const { largura: W, altura: Ht } = fotoAtual;
+    for (let j = 0; j <= 20; j++) for (let i = 0; i <= 20; i++) {
+      const p = [(i / 20) * W, (j / 20) * Ht], ll = paraChao(gr, p);
+      if (ll && pxPorMetro(gr.H, p) >= 3) pts.push(ll);
+    }
+  }
+  if (pts.length < 3) pts = gr.pares.map((p) => p.mapa);
+  mapa.fitBounds(L.latLngBounds(pts).pad(0.1), { maxZoom: 20 });
 }
 
 function trocarFoto() {
   fotoAtual = estado.fotos.find((f) => f.id === $("proj-foto").value) || null;
   pendente = null; desenharFoto(); desenharMapa();
   const gr = fotoAtual && geo(fotoAtual);
-  if (gr?.pares.length) mapa.fitBounds(L.latLngBounds(gr.pares.map((p) => p.mapa)).pad(0.5));
+  enquadrar();
   dica(fotoAtual ? "Clique num ponto do CHÃO na foto (canto de faixa de pedestres, base de poste, quina de calçada) e depois no mesmo ponto no mapa." : "Envie fotos na etapa 1.");
 }
 
 export function projecaoVisivel() {
-  mapa.invalidateSize(); desenharFoto();
+  mapa.invalidateSize(); desenharFoto(); enquadrar();
 }
 
 export function iniciarProjecao() {
@@ -324,7 +362,7 @@ export function iniciarProjecao() {
       $("proj-status").innerHTML = `<span class="ok">${m.nome}</span>: ${m.largura}×${m.altura} px, cobrindo ${fmt(m.largura * m.metrosPorPixel)} × ${fmt(m.altura * m.metrosPorPixel)} m.
         Ele aparece no mapa ao lado e na etapa "Área", e pode ser usado na etapa "Densidade" (já em escala, sem retângulo de referência).`;
       $("proj-baixar").disabled = false;
-      mostrarMosaicoNoMapa(); mapa.fitBounds(m.bounds); avisar("ortomosaico");
+      mostrarMosaicoNoMapa(); avisar("ortomosaico");
     } catch (e) { $("proj-status").innerHTML = `<span class="erro">${e.message}</span>`; console.error(e); }
     b.disabled = false;
   };
