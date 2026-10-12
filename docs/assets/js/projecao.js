@@ -10,6 +10,7 @@ const $ = (id) => document.getElementById(id);
 let mapa, camadaPares, camadaMosaico = null, marcadorCursor = null, local = null;
 let fotoAtual = null, pendente = null, esc = 1, zoom = 1;
 let previsto = null, arrasto = null, ignorarClique = false; // marcador de prévia no mapa; par arrastado na foto
+let desfeitos = {}; // pares removidos por foto, para Refazer
 const cv = () => $("proj-canvas");
 
 /** Pares e homografia da foto (chaveados pelo SHA-256, para sobreviverem a recarregar/importar). */
@@ -278,6 +279,7 @@ function cancelarPendente() {
 function confirmarPar(latlng) {
   const gr = geo(fotoAtual);
   gr.pares.push({ foto: pendente.map((v) => +v.toFixed(1)), mapa: [+latlng.lat.toFixed(7), +latlng.lng.toFixed(7)] });
+  desfeitos[fotoAtual.hash] = []; // um par novo encerra a sequência de Refazer
   cancelarPendente();
   dica(gr.pares.length < 4 ? `Par salvo. Marque mais ${4 - gr.pares.length}.` : "Par salvo. Clique no próximo ponto na foto. Para corrigir um par, arraste o marcador na foto ou no mapa.");
   parAlterado(gr);
@@ -291,7 +293,18 @@ function desfazer() {
   if (!fotoAtual) return;
   if (pendente) { cancelarPendente(); desenharFoto(); return; }
   const g = geo(fotoAtual);
-  if (g.pares.length) { g.pares.pop(); parAlterado(g); }
+  if (!g.pares.length) return;
+  (desfeitos[fotoAtual.hash] ||= []).push(g.pares.pop());
+  dica(`Par ${g.pares.length + 1} removido. Use "Refazer" (Ctrl+Y) para recolocá-lo.`);
+  parAlterado(g);
+}
+function refazer() {
+  const pilha = fotoAtual && desfeitos[fotoAtual.hash];
+  if (!pilha?.length) return;
+  const g = geo(fotoAtual);
+  g.pares.push(pilha.pop());
+  dica(`Par ${g.pares.length} recolocado.`);
+  parAlterado(g);
 }
 
 // Arrastar um par na foto: aperta sobre a marca, arrasta, solta.
@@ -325,7 +338,9 @@ function teclas(e) {
   if (["INPUT", "SELECT", "TEXTAREA"].includes(e.target.tagName)) return;
   if (e.key === "Escape" && pendente) { cancelarPendente(); desenharFoto(); dica("Ponto cancelado."); }
   else if (e.key === "Enter" && pendente && previsto && mapa.hasLayer(previsto)) { e.preventDefault(); confirmarPar(previsto.getLatLng()); }
-  else if (e.key === "Backspace" || e.key === "Delete") { e.preventDefault(); desfazer(); }
+  else if ((e.ctrlKey || e.metaKey) && (e.key.toLowerCase() === "y" || (e.shiftKey && e.key.toLowerCase() === "z"))) { e.preventDefault(); refazer(); }
+  else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "z") { e.preventDefault(); desfazer(); }
+  else if (e.key === "Backspace" || e.key === "Delete") { e.preventDefault(); if (!e.repeat) desfazer(); } // segurar a tecla não apaga tudo
 }
 /** Ponto da foto → lat/lon no chão, ou null se cair atrás da câmera (acima do horizonte) ou longe demais. */
 function paraChao(gr, p) {
@@ -423,6 +438,7 @@ export function iniciarProjecao() {
   ouvir("importado", () => { Object.values(estado.georef).forEach(recalcular); opcoes(); desenharMapa(); });
   sel.onchange = trocarFoto;
   $("proj-desfazer").onclick = desfazer;
+  $("proj-refazer").onclick = refazer;
   for (const [t, f] of [["−", 1 / 1.5], ["+", 1.5]]) {
     const b = document.createElement("button"); b.textContent = t; b.title = "Zoom na foto";
     b.onclick = () => { zoom = Math.max(0.5, Math.min(8, zoom * f)); desenharFoto(); };

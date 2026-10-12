@@ -152,12 +152,13 @@
         <div class="barra">
           <label>Foto: <select id="proj-foto" style="width:auto;max-width:28em"></select></label>
           <span id="proj-zoom" class="grupo-botoes" style="margin:0"></span>
-          <button id="proj-desfazer">Desfazer último ponto</button>
+          <button id="proj-desfazer" title="Backspace ou Ctrl+Z">Desfazer último ponto</button>
+          <button id="proj-refazer" title="Ctrl+Y">Refazer</button>
           <button id="proj-tela" title="Ocupar a tela inteira (Esc para sair)">⛶ Tela cheia</button>
         </div>
         <p class="pequeno" id="proj-dica">Envie fotos na etapa 1.</p>
         <p class="pequeno suave">Atalhos: roda do mouse amplia a foto · arraste um ponto (na foto ou no mapa) para corrigi-lo ·
-          <kbd>Enter</kbd> confirma o marcador rosa · <kbd>Esc</kbd> cancela o ponto pendente · <kbd>Backspace</kbd> desfaz o último par</p>
+          <kbd>Enter</kbd> confirma o marcador rosa · <kbd>Esc</kbd> cancela o ponto pendente · <kbd>Backspace</kbd> ou <kbd>Ctrl+Z</kbd> desfaz o último par · <kbd>Ctrl+Y</kbd> refaz</p>
         <div class="grade-projecao">
           <div class="area-trabalho vazia" id="proj-area"><canvas id="proj-canvas" width="10" height="10"></canvas></div>
           <div id="proj-mapa"></div>
