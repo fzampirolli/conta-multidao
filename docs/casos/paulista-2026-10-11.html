@@ -18,6 +18,8 @@
       <a href="paulista-2026-10-11.html" aria-current="page">Estudo de caso</a>
       <a href="https://github.com/fzampirolli/conta-multidao">Código aberto</a>
     </nav>
+      <label class="largura" title="Largura das páginas e áreas de trabalho (vale para todo o site)">Largura:
+        <select id="largura-trabalho"><option value="normal">normal</option><option value="larga">larga</option><option value="janela">janela inteira</option></select></label>
   </div>
 </header>
 
@@ -233,5 +235,9 @@ Monte Carlo (20.000 simulações, semente 2026):
 
 <footer><div class="conteudo">Fotos: Ricardo Stuckert / Lula Oficial (Flickr), CC BY-SA 4.0. Mapas © colaboradores do OpenStreetMap.
   Texto e análise: CC BY 4.0, Conta Multidão.</div></footer>
+<script type="module">
+  import { iniciarLargura } from "../assets/js/largura.js";
+  iniciarLargura();
+</script>
 </body>
 </html>

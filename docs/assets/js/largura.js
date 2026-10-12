@@ -1,5 +1,6 @@
-// Padrão de tamanho das áreas de trabalho, igual em todas as abas:
-//  1. seletores globais de Largura (normal, larga, janela inteira) e Altura (baixa, média, alta);
+// Padrão de tamanho, igual em todo o site:
+//  1. seletor de Largura (normal, larga, janela inteira) no cabeçalho de todas as páginas, com a escolha compartilhada;
+//     seletor de Altura (baixa, média, alta) na barra das etapas da ferramenta;
 //  2. divisor arrastável entre as duas colunas (imagem | mapa ou painel) das abas com duas colunas;
 //  3. alça arrastável embaixo de cada área de imagem ou mapa, para mudar só a altura dela.
 // Tudo fica salvo no navegador. Duplo clique no divisor ou na alça volta ao padrão.
@@ -74,6 +75,7 @@ export function iniciarLargura() {
   aplicar(salvo.largura || "larga");
   sel.onchange = () => { salvo.largura = sel.value; guardar(); aplicar(sel.value); };
   const selA = document.getElementById("altura-trabalho");
+  if (!selA) return; // páginas de texto (método, estudo de caso) só têm o seletor de largura
   const aplicarA = (v) => { document.documentElement.dataset.alturaGeral = v; selA.value = v; avisarRedimensionar(); };
   aplicarA(salvo.altura || "alta");
   selA.onchange = () => { salvo.altura = selA.value; guardar(); aplicarA(selA.value); };

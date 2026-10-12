@@ -210,8 +210,14 @@ kbd { font: .8em ui-monospace, monospace; border: 1px solid var(--borda); border
 /* ---------- Padrão de largura (todas as abas) ---------- */
 :root[data-largura="larga"] main { max-width: 1600px; }
 :root[data-largura="janela"] main { max-width: none; }
-.etapas .largura { margin-left: auto; display: flex; align-items: center; gap: .4rem; font-size: .9rem; color: var(--suave); }
-.etapas .largura select { width: auto; }
+.largura { display: flex; align-items: center; gap: .4rem; font-size: .9rem; color: var(--suave); }
+.largura select { width: auto; padding: .2rem .4rem; }
+.etapas .largura { margin-left: auto; }
+/* páginas de texto: normal 820 px (leitura confortável), larga 1180 px, janela inteira */
+:root[data-largura="larga"] .artigo { max-width: 1180px; }
+:root[data-largura="janela"] .artigo { max-width: none; }
+:root[data-largura="larga"] .topo .conteudo, :root[data-largura="larga"] footer .conteudo { max-width: 1600px; }
+:root[data-largura="janela"] .topo .conteudo, :root[data-largura="janela"] footer .conteudo { max-width: none; }
 /* Duas colunas com divisor arrastável; --f é a fração da coluna da esquerda */
 [data-divisivel] { display: grid; grid-template-columns: minmax(0, calc(var(--f, .5) * 100% - 9px)) 10px minmax(0, 1fr); gap: 0 .4rem; }
 .divisor { cursor: col-resize; touch-action: none; align-self: stretch; min-height: 60px; border-radius: 5px; position: relative;
@@ -244,3 +250,7 @@ kbd { font: .8em ui-monospace, monospace; border: 1px solid var(--borda); border
 @keyframes virar-ampulheta { 0%, 40% { transform: rotate(0); } 50%, 90% { transform: rotate(180deg); } 100% { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .ampulheta .icone { animation: none; } }
 body.processando, body.processando canvas { cursor: progress; }
+/* em telas estreitas a largura não muda nada: o seletor some do cabeçalho */
+@media (max-width: 760px) { .topo .largura { display: none; } }
+/* tabelas largas das páginas de texto rolam dentro de si no celular, sem empurrar a página */
+@media (max-width: 760px) { .artigo table { display: block; overflow-x: auto; } }

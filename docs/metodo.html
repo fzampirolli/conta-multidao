@@ -18,6 +18,8 @@
       <a href="casos/paulista-2026-10-11.html">Estudo de caso</a>
       <a href="https://github.com/fzampirolli/conta-multidao">Código aberto</a>
     </nav>
+      <label class="largura" title="Largura das páginas e áreas de trabalho (vale para todo o site)">Largura:
+        <select id="largura-trabalho"><option value="normal">normal</option><option value="larga">larga</option><option value="janela">janela inteira</option></select></label>
   </div>
 </header>
 
@@ -163,6 +165,8 @@
 <footer><div class="conteudo">Conta Multidão: software livre (MIT). Textos desta página: CC BY 4.0.</div></footer>
 <script type="module">
   import { desenharGuia } from "./assets/js/densidades.js";
+  import { iniciarLargura } from "./assets/js/largura.js";
+  iniciarLargura();
   desenharGuia(document.getElementById("guia"));
 </script>
 </body>
