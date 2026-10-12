@@ -51,7 +51,7 @@ export async function carregarExemplo(botao) {
     botao.textContent = `Baixando exemplo ${++n}…`;
     const blob = await (await fetch(new URL(f.arquivo, base))).blob();
     await adicionarArquivo(blob, f.arquivo, {
-      credito: `Foto: ${f.autor}`, licenca: f.licenca, origem: f.url, data: f.data,
+      credito: `${f.vista ? f.vista + " · " : ""}Foto: ${f.autor}`, licenca: f.licenca, origem: f.url, data: f.data,
     });
   }
   botao.textContent = "Fotos de exemplo carregadas";

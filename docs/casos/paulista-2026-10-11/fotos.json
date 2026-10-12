@@ -14,7 +14,8 @@
    "largura_original": 3543,
    "altura_original": 1993,
    "tipo": "aérea",
-   "exemplo": true
+   "exemplo": true,
+   "vista": "olhando para a Consolação"
   },
   {
    "id": "55583249165",
@@ -27,7 +28,8 @@
    "largura_original": 3543,
    "altura_original": 1993,
    "tipo": "aérea",
-   "exemplo": false
+   "exemplo": false,
+   "vista": "olhando para o Paraíso"
   },
   {
    "id": "55583249180",
@@ -40,7 +42,8 @@
    "largura_original": 1993,
    "altura_original": 3543,
    "tipo": "aérea",
-   "exemplo": true
+   "exemplo": true,
+   "vista": "olhando para o Paraíso"
   },
   {
    "id": "55582830431",
@@ -53,7 +56,8 @@
    "largura_original": 1993,
    "altura_original": 3543,
    "tipo": "aérea",
-   "exemplo": true
+   "exemplo": true,
+   "vista": "olhando para o Paraíso"
   },
   {
    "id": "55581805947",
@@ -66,7 +70,8 @@
    "largura_original": 3543,
    "altura_original": 1993,
    "tipo": "aérea",
-   "exemplo": true
+   "exemplo": true,
+   "vista": "olhando para o Paraíso"
   },
   {
    "id": "55581822232",
@@ -92,7 +97,8 @@
    "largura_original": 3543,
    "altura_original": 2361,
    "tipo": "solo/elevada",
-   "exemplo": false
+   "exemplo": false,
+   "vista": "olhando para o Paraíso"
   },
   {
    "id": "55582967668",
@@ -144,7 +150,8 @@
    "largura_original": 3543,
    "altura_original": 2361,
    "tipo": "solo/elevada",
-   "exemplo": false
+   "exemplo": false,
+   "vista": "olhando para o Paraíso"
   },
   {
    "id": "55583055864",
@@ -261,7 +268,8 @@
    "largura_original": 3543,
    "altura_original": 2308,
    "tipo": "solo/elevada",
-   "exemplo": false
+   "exemplo": false,
+   "vista": "olhando para o Paraíso"
   },
   {
    "id": "55582081807",
@@ -287,7 +295,8 @@
    "largura_original": 3543,
    "altura_original": 2466,
    "tipo": "solo/elevada",
-   "exemplo": false
+   "exemplo": false,
+   "vista": "olhando para o Paraíso"
   },
   {
    "id": "55583301084",
@@ -443,7 +452,8 @@
    "largura_original": 3543,
    "altura_original": 1993,
    "tipo": "aérea",
-   "exemplo": true
+   "exemplo": true,
+   "vista": "olhando para a Consolação"
   },
   {
    "id": "55583675910",
@@ -456,7 +466,8 @@
    "largura_original": 2450,
    "altura_original": 3543,
    "tipo": "aérea",
-   "exemplo": true
+   "exemplo": true,
+   "vista": "olhando para a Consolação"
   },
   {
    "id": "55583347126",
@@ -562,5 +573,6 @@
    "tipo": "outra",
    "exemplo": false
   }
- ]
+ ],
+ "nota_horario": "O campo 'data' vem do EXIF DateTime gravado pelo Lightroom (hora de edição), não da hora de captura."
 }

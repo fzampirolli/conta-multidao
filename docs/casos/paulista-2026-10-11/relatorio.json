@@ -2,13 +2,14 @@
  "ferramenta": "Conta Multidão",
  "versaoMetodo": "1.0",
  "geradoEm": "2026-10-12T12:00:00-03:00",
- "evento": "Ato na Avenida Paulista, São Paulo (SP), 11/10/2026 — foto aérea de referência às 14:03",
+ "evento": "Ato na Avenida Paulista, São Paulo (SP), 11/10/2026 — horário exato das fotos desconhecido (metadados só têm a hora de edição)",
  "metodo": "Total = Σ área × densidade (Jacobs); área = comprimento do eixo (OSM) × largura; densidade por classe visual (amostras com contagem individual inviáveis nas fotos disponíveis); incerteza por Monte Carlo.",
  "notas": [
   "Largura: mediana de 50,3 m entre fachadas (161 medições em contornos de prédios do OpenStreetMap, P25 45,2 m, P75 60,7 m); adotado 45 m ± 15% para descontar recuos privados, bancas, canteiros e o carro de som.",
   "Comprimentos medidos sobre o eixo da avenida no OpenStreetMap (cruzamentos: Consolação 165 m, Augusta 559 m, J. E. de Lima 1.863 m, Brigadeiro 2.110 m, fim do eixo ≈2.718 m a partir da Av. Angélica/Minas Gerais).",
   "Densidades atribuídas por comparação visual com o guia de classes; tentativas de amostra com IA resultaram em >9 pessoas/m² (implausível), indicando supercontagem nessas fotos.",
-  "Fotos: única fonte com licença aberta é o álbum oficial da campanha (possível viés de seleção de ângulo e horário)."
+  "Fotos: única fonte com licença aberta é o álbum oficial da campanha (possível viés de seleção de ângulo e horário).",
+  "Horários: o campo 'data' das fotos é a hora de edição/exportação no Lightroom (vários arquivos com 14:03:12), não a hora de captura."
  ],
  "fotos": [
   {

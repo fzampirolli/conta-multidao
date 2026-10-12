@@ -119,7 +119,7 @@ button.ativo { background: var(--acento-claro); border-color: var(--acento); col
 .galeria { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: .8rem; margin-top: 1rem; }
 .miniatura { position: relative; background: var(--cartao); border: 1px solid var(--borda); border-radius: 10px; overflow: hidden; }
 .miniatura img { display: block; width: 100%; aspect-ratio: 4/3; object-fit: cover; }
-.miniatura .legenda { padding: .35rem .5rem; font-size: .78rem; color: var(--suave); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.miniatura .legenda { padding: .35rem .5rem; font-size: .78rem; color: var(--suave); overflow-wrap: anywhere; }
 .miniatura button { position: absolute; top: 6px; right: 6px; padding: .1rem .45rem; font-size: .8rem; }
 .miniatura.ref { outline: 3px solid var(--acento); }
 
