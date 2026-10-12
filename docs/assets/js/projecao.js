@@ -93,7 +93,17 @@ function infoMedida(gr, m) {
   const a = gr.H && paraChao(gr, m.foto[0]), b = gr.H && paraChao(gr, m.foto[1]);
   const proj = a && b ? distM(a, b) : null, orto = distM(...m.mapa);
   const meio = [(m.foto[0][0] + m.foto[1][0]) / 2, (m.foto[0][1] + m.foto[1][1]) / 2];
-  return { proj, orto, erro: proj && m.conferida ? (proj - orto) / orto : null, pxm: gr.H ? pxPorMetro(gr.H, meio) : null };
+  // Incerteza: quanto a distância muda se cada clique errar 3 px (pior direção). Perto do horizonte, 1 px vale muitos metros.
+  let inc = null;
+  if (proj) {
+    inc = 0;
+    for (let k = 0; k < 2; k++) for (const [dx, dy] of [[3, 0], [-3, 0], [0, 3], [0, -3]]) {
+      const q = m.foto.map((p) => p.slice()); q[k][0] += dx; q[k][1] += dy;
+      const a2 = paraChao(gr, q[0]), b2 = paraChao(gr, q[1]);
+      inc = a2 && b2 ? Math.max(inc, Math.abs(distM(a2, b2) - proj)) : Infinity;
+    }
+  }
+  return { proj, orto, inc, erro: proj && m.conferida ? (proj - orto) / orto : null, pxm: gr.H ? pxPorMetro(gr.H, meio) : null };
 }
 function desenharMedidasFoto(g, gr) {
   const medidas = gr.medidas || [];
@@ -123,17 +133,20 @@ function listarMedidas(gr) {
   const el = $("proj-medidas"), medidas = gr.medidas || [];
   if (!medidas.length) { el.innerHTML = medindo ? '<p class="pequeno suave">Nenhuma medida ainda: clique nas duas margens da rua na foto.</p>' : ""; return; }
   const linhas = medidas.map((m, i) => {
-    const { proj, orto, erro, pxm } = infoMedida(gr, m);
+    const { proj, orto, erro, pxm, inc } = infoMedida(gr, m);
     const cls = erro == null ? "" : Math.abs(erro) <= 0.05 ? "ok" : Math.abs(erro) > 0.15 ? "erro" : "";
-    return `<tr><td>M${i + 1}</td><td class="num">${pxm ? fmt(pxm, 1) : "—"}</td><td class="num">${proj ? fmt(proj, 1) + " m" : "—"}</td>
+    const fraca = inc == null || inc / proj > 0.15; // a própria medida não é confiável: o clique decide mais que a projeção
+    return `<tr><td>M${i + 1}</td><td class="num">${pxm ? fmt(pxm, 1) : "—"}</td><td class="num">${proj ? fmt(proj, 1) + " m" : "—"}
+      ${proj ? `<br><span class="${fraca ? "erro" : "suave"} pequeno">± ${isFinite(inc) ? fmt(inc, inc < 10 ? 1 : 0) : "∞"} m${fraca ? " · não confiável" : ""}</span>` : ""}</td>
       <td class="num">${m.conferida ? fmt(orto, 1) + " m" : '<span class="suave">arraste as pontas no mapa</span>'}</td>
       <td class="num ${cls}">${erro == null ? "—" : (erro > 0 ? "+" : "") + fmt(100 * erro, 0) + "%"}</td>
       <td><button data-del-medida="${i}" title="Apagar medida">🗑</button></td></tr>`;
   }).join("");
   el.innerHTML = `<h4 style="margin:.6rem 0 .2rem">📏 Medidas de conferência</h4>
     <table><tr><th>#</th><th class="num">px/m (perto ↔ longe)</th><th class="num">Pela projeção</th><th class="num">Na ortofoto</th><th class="num">Erro</th><th></th></tr>${linhas}</table>
-    <p class="pequeno suave">Erro até ±5%: escala boa. Acima de ±15%: a projeção distorce ali. Erros que crescem quando o px/m diminui
-    (mais longe da câmera) indicam que o modelo piora com a distância.</p>`;
+    <p class="pequeno suave">O "±" é quanto a medida muda se cada clique errar 3 pixels. Medidas <b>ao longo</b> da avenida, longe da câmera,
+    costumam ser "não confiáveis": a perspectiva comprime essa direção e 1 pixel vale muitos metros. Prefira medidas <b>transversais</b>
+    (de uma margem à outra). Erro até ±5%: escala boa. Acima de ±15%: a projeção distorce ali (só vale para medidas confiáveis).</p>`;
   el.querySelectorAll("[data-del-medida]").forEach((b) => (b.onclick = () => { gr.medidas.splice(+b.dataset.delMedida, 1); salvarLocal(); desenharFoto(); desenharMapa(); }));
 }
 function cliqueMedida(p) {
