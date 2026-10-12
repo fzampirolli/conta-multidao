@@ -32,6 +32,7 @@ function areaAmostra() {
 
 function desenhar() {
   const f = fonteImagem(imgId);
+  $("den-area").classList.toggle("vazia", !f);
   if (!f) { cv.width = 10; cv.height = 10; return; }
   const W = f.naturalWidth || f.width, Ht = f.naturalHeight || f.height;
   const larguraVisivel = $("den-area").clientWidth || 900;

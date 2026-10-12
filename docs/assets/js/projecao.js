@@ -38,6 +38,7 @@ function recalcular(g) {
 // ---------- Desenho ----------
 function desenharFoto() {
   const c = cv(), g = c.getContext("2d");
+  $("proj-area").classList.toggle("vazia", !fotoAtual);
   if (!fotoAtual) { c.width = 10; c.height = 10; return; }
   const img = fotoAtual.img, W = img.naturalWidth, H = img.naturalHeight;
   esc = Math.min(1, ($("proj-area").clientWidth || 600) / W) * zoom;
