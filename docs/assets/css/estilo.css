@@ -203,3 +203,7 @@ footer .conteudo { max-width: 1180px; margin: auto; }
 .area-trabalho.vazia::after { content: "Nenhuma imagem ainda. Envie fotos na etapa 1 ou use as fotos de exemplo."; color: var(--suave); padding: 1rem; text-align: center; }
 @media (max-width: 600px) { .guia-densidade { grid-template-columns: 1fr 1fr; } }
 .amostra-cor { display: inline-block; width: 1.1em; height: 1.1em; border-radius: 3px; border: 1px solid var(--borda); vertical-align: middle; }
+/* Pares de controle no mapa (arrastáveis) e marcador de prévia */
+.marca-par { background: #ffd23f; border: 2px solid #111; border-radius: 50%; cursor: move; box-sizing: border-box; }
+.marca-par.prevista { background: #ff3f8e; border-color: #fff; box-shadow: 0 0 0 2px #ff3f8e; }
+kbd { font: .8em ui-monospace, monospace; border: 1px solid var(--borda); border-bottom-width: 2px; border-radius: 4px; padding: 0 .3em; }

@@ -9,6 +9,7 @@ import { criarCamadasBase } from "./camadas.js";
 const $ = (id) => document.getElementById(id);
 let mapa, camadaPares, camadaMosaico = null, marcadorCursor = null, local = null;
 let fotoAtual = null, pendente = null, esc = 1, zoom = 1;
+let previsto = null, arrasto = null, ignorarClique = false; // marcador de prévia no mapa; par arrastado na foto
 const cv = () => $("proj-canvas");
 
 /** Pares e homografia da foto (chaveados pelo SHA-256, para sobreviverem a recarregar/importar). */
@@ -57,13 +58,18 @@ function marca(g, [x, y], n, res, pend = false) {
   g.font = "bold 14px system-ui"; g.fillText(n + (res != null ? ` (${res.toFixed(1)} m)` : ""), X + 8, Y - 8);
 }
 
+const iconePar = (cls) => L.divIcon({ className: `marca-par ${cls}`, iconSize: cls ? [22, 22] : [14, 14] });
+function parAlterado(gr) { recalcular(gr); salvarLocal(); desenharFoto(); desenharMapa(); avisar("georef"); }
+
 function desenharMapa() {
   camadaPares.clearLayers();
   if (!fotoAtual) return;
   const gr = geo(fotoAtual), S = sistema();
   gr.pares.forEach((p, i) => {
-    L.circleMarker(p.mapa, { radius: 6, color: "#111", weight: 2, fillColor: "#ffd23f", fillOpacity: 1 })
-      .bindTooltip(`${i + 1}`, { permanent: true, direction: "right", className: "rotulo-par" }).addTo(camadaPares);
+    L.marker(p.mapa, { icon: iconePar(""), draggable: true, title: "Arraste para corrigir" })
+      .bindTooltip(`${i + 1}`, { permanent: true, direction: "right", className: "rotulo-par" })
+      .on("dragend", (e) => { const ll = e.target.getLatLng(); p.mapa = [+ll.lat.toFixed(7), +ll.lng.toFixed(7)]; parAlterado(gr); })
+      .addTo(camadaPares);
     if (gr.H) { // vetor de resíduo: onde a homografia "acha" que o ponto da foto cai
       const q = S.paraLatLon(aplicarH(gr.H, p.foto));
       L.polyline([p.mapa, q], { color: "#e0245e", weight: 2 }).addTo(camadaPares);
@@ -253,21 +259,73 @@ function mostrarMosaicoNoMapa() {
 // ---------- Interação ----------
 function cliqueFoto(e) {
   if (!fotoAtual) return;
+  if (ignorarClique) { ignorarClique = false; return; } // fim de um arrasto, não um clique
   pendente = pontoDoMouse(e);
-  dica(`Agora clique no MESMO ponto no mapa (par ${geo(fotoAtual).pares.length + 1}).`);
-  // Com homografia, o mapa vai até onde o ponto deve estar, já com zoom para o clique
   const gr = geo(fotoAtual), ll = gr.H && paraChao(gr, pendente);
-  if (ll) mapa.setView(ll, Math.max(mapa.getZoom(), 19));
+  if (ll) {
+    // Prévia: marcador rosa onde o ponto deve estar. Arraste-o e tecle Enter, ou clique no lugar certo.
+    mapa.setView(ll, Math.max(mapa.getZoom(), 19));
+    previsto ||= L.marker(ll, { icon: iconePar("prevista"), draggable: true, title: "Arraste até o ponto certo e tecle Enter", zIndexOffset: 1000 });
+    previsto.setLatLng(ll).addTo(mapa);
+    dica(`Par ${gr.pares.length + 1}: o marcador rosa mostra onde o ponto deve estar. Arraste-o até o lugar exato e tecle Enter, ou clique no lugar certo do mapa. Esc cancela.`);
+  } else dica(`Agora clique no MESMO ponto no mapa (par ${gr.pares.length + 1}). Esc cancela.`);
   desenharFoto();
+}
+function cancelarPendente() {
+  pendente = null;
+  if (previsto) mapa.removeLayer(previsto);
+}
+function confirmarPar(latlng) {
+  const gr = geo(fotoAtual);
+  gr.pares.push({ foto: pendente.map((v) => +v.toFixed(1)), mapa: [+latlng.lat.toFixed(7), +latlng.lng.toFixed(7)] });
+  cancelarPendente();
+  dica(gr.pares.length < 4 ? `Par salvo. Marque mais ${4 - gr.pares.length}.` : "Par salvo. Clique no próximo ponto na foto. Para corrigir um par, arraste o marcador na foto ou no mapa.");
+  parAlterado(gr);
 }
 function cliqueMapa(e) {
   if (!fotoAtual) return;
   if (!pendente) { dica("Primeiro clique no ponto na FOTO, depois no mapa."); return; }
-  const gr = geo(fotoAtual);
-  gr.pares.push({ foto: pendente.map((v) => +v.toFixed(1)), mapa: [+e.latlng.lat.toFixed(7), +e.latlng.lng.toFixed(7)] });
-  pendente = null; recalcular(gr); salvarLocal();
-  dica(gr.pares.length < 4 ? `Par salvo. Marque mais ${4 - gr.pares.length}.` : "Par salvo. Passe o mouse sobre a foto para conferir onde cada ponto cai no mapa.");
-  desenharFoto(); desenharMapa(); avisar("georef");
+  confirmarPar(e.latlng);
+}
+function desfazer() {
+  if (!fotoAtual) return;
+  if (pendente) { cancelarPendente(); desenharFoto(); return; }
+  const g = geo(fotoAtual);
+  if (g.pares.length) { g.pares.pop(); parAlterado(g); }
+}
+
+// Arrastar um par na foto: aperta sobre a marca, arrasta, solta.
+function parSobMouse(e) {
+  const gr = fotoAtual && geo(fotoAtual);
+  if (!gr) return -1;
+  const p = pontoDoMouse(e);
+  let melhor = -1, dmin = 12; // px na tela
+  gr.pares.forEach((q, i) => { const d = Math.hypot(q.foto[0] - p[0], q.foto[1] - p[1]) * esc; if (d < dmin) { dmin = d; melhor = i; } });
+  return melhor;
+}
+function apertarFoto(e) {
+  if (e.button !== 0 || pendente) return;
+  const i = parSobMouse(e);
+  if (i < 0) return;
+  arrasto = i; ignorarClique = true; e.preventDefault();
+}
+function arrastarFoto(e) {
+  if (arrasto == null) { cv().style.cursor = parSobMouse(e) >= 0 && !pendente ? "move" : ""; return; }
+  const p = pontoDoMouse(e), { largura: W, altura: H } = fotoAtual;
+  geo(fotoAtual).pares[arrasto].foto = [+Math.min(W, Math.max(0, p[0])).toFixed(1), +Math.min(H, Math.max(0, p[1])).toFixed(1)];
+  desenharFoto();
+}
+function soltarFoto() {
+  if (arrasto == null) return;
+  arrasto = null; parAlterado(geo(fotoAtual));
+}
+
+function teclas(e) {
+  if (!$("painel-projecao").classList.contains("ativo") || !fotoAtual) return;
+  if (["INPUT", "SELECT", "TEXTAREA"].includes(e.target.tagName)) return;
+  if (e.key === "Escape" && pendente) { cancelarPendente(); desenharFoto(); dica("Ponto cancelado."); }
+  else if (e.key === "Enter" && pendente && previsto && mapa.hasLayer(previsto)) { e.preventDefault(); confirmarPar(previsto.getLatLng()); }
+  else if (e.key === "Backspace" || e.key === "Delete") { e.preventDefault(); desfazer(); }
 }
 /** Ponto da foto → lat/lon no chão, ou null se cair atrás da câmera (acima do horizonte) ou longe demais. */
 function paraChao(gr, p) {
@@ -319,8 +377,7 @@ function enquadrar() {
 
 function trocarFoto() {
   fotoAtual = estado.fotos.find((f) => f.id === $("proj-foto").value) || null;
-  pendente = null; desenharFoto(); desenharMapa();
-  const gr = fotoAtual && geo(fotoAtual);
+  cancelarPendente(); desenharFoto(); desenharMapa();
   enquadrar();
   dica(fotoAtual ? "Clique num ponto do CHÃO na foto (canto de faixa de pedestres, base de poste, quina de calçada) e depois no mesmo ponto no mapa. Use a roda do mouse para ampliar a foto." : "Envie fotos na etapa 1.");
 }
@@ -338,6 +395,10 @@ export function iniciarProjecao() {
   mapa.on("click", cliqueMapa);
   cv().addEventListener("click", cliqueFoto);
   cv().addEventListener("mousemove", moverFoto);
+  cv().addEventListener("mousedown", apertarFoto);
+  cv().addEventListener("mousemove", arrastarFoto);
+  window.addEventListener("mouseup", soltarFoto);
+  document.addEventListener("keydown", teclas);
   // Roda do mouse: zoom na foto mantendo fixo o ponto sob o cursor
   cv().addEventListener("wheel", (e) => {
     if (!fotoAtual) return;
@@ -361,7 +422,7 @@ export function iniciarProjecao() {
   ouvir("fotos", opcoes); ouvir("georef", opcoes);
   ouvir("importado", () => { Object.values(estado.georef).forEach(recalcular); opcoes(); desenharMapa(); });
   sel.onchange = trocarFoto;
-  $("proj-desfazer").onclick = () => { if (!fotoAtual) return; const g = geo(fotoAtual); if (pendente) pendente = null; else g.pares.pop(); recalcular(g); salvarLocal(); desenharFoto(); desenharMapa(); avisar("georef"); };
+  $("proj-desfazer").onclick = desfazer;
   for (const [t, f] of [["−", 1 / 1.5], ["+", 1.5]]) {
     const b = document.createElement("button"); b.textContent = t; b.title = "Zoom na foto";
     b.onclick = () => { zoom = Math.max(0.5, Math.min(8, zoom * f)); desenharFoto(); };
