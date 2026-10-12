@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>O método: como estimar o tamanho de uma multidão | Conta Multidão</title>
+  <meta name="description" content="Explicação didática do método científico de estimativa de público: registro de imagens, área × densidade, homografia, inteligência artificial e incerteza.">
+  <link rel="icon" href="assets/icone.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/css/estilo.css">
+</head>
+<body>
+<header class="topo">
+  <div class="conteudo">
+    <a class="marca" href="./"><img src="assets/icone.svg" alt="" width="30" height="30"> Conta Multidão</a>
+    <nav>
+      <a href="./">Ferramenta</a>
+      <a href="metodo.html" aria-current="page">O método</a>
+      <a href="casos/paulista-2026-10-11.html">Estudo de caso</a>
+      <a href="https://github.com/fzampirolli/conta-multidao">Código aberto</a>
+    </nav>
+  </div>
+</header>
+
+<main class="artigo">
+  <h1>Como estimar o tamanho de uma multidão</h1>
+  <p class="lead suave">Um guia em 6 passos, sem fórmulas complicadas, do método que esta ferramenta usa.
+    Ele vale para qualquer evento, de qualquer causa, em qualquer lugar.</p>
+
+  <div class="explica">
+    <b>Por que isso importa?</b> Depois de toda grande manifestação, surgem números muito diferentes:
+    organizadores costumam anunciar valores altos e opositores, valores baixos. Um método aberto
+    permite que <b>qualquer pessoa refaça a conta</b> e veja exatamente onde as estimativas divergem.
+  </div>
+
+  <h2><span class="passo-num">1</span>A ideia central: área × densidade</h2>
+  <p>Não dá para contar centenas de milhares de pessoas uma a uma. O jornalista Herbert Jacobs propôs em 1967, na
+    Universidade da Califórnia em Berkeley, uma solução simples que é usada até hoje:</p>
+  <div class="formula">Público ≈ Área ocupada (m²) × Densidade (pessoas por m²)</div>
+  <p>Se uma avenida tem 1.000 m de comprimento por 40 m de largura (40.000 m²) e, em média, há 2 pessoas por m²,
+    estavam ali cerca de <b>80.000 pessoas</b> naquele momento. O trabalho, então, se resume a medir bem
+    essas duas grandezas e a dizer com honestidade quanto elas podem variar.</p>
+  <div class="guia-densidade" id="guia"></div>
+  <p class="pequeno suave">Cada quadro representa 5 m × 5 m. Acima de 4 pessoas/m² já há contato físico intenso;
+    de 6 a 7 pessoas/m² ocorrem esmagamentos. Por isso, densidades muito altas em áreas enormes são suspeitas.</p>
+
+  <h2><span class="passo-num">2</span>Registro: juntar as fotos numa única imagem</h2>
+  <p>Uma foto raramente mostra a multidão inteira. Com várias fotos, surge um risco: <b>contar a mesma pessoa duas vezes</b>
+    nas regiões em que as fotos se sobrepõem. A solução é o <b>registro de imagens</b>, técnica clássica de
+    processamento de imagens que alinha as fotos num mosaico (como um panorama de celular):</p>
+  <ol>
+    <li><b>Pontos de interesse</b>: o algoritmo ORB encontra milhares de cantos e detalhes marcantes em cada foto.</li>
+    <li><b>Correspondências</b>: cada ponto recebe uma "assinatura" numérica, e procuramos assinaturas parecidas na outra foto.
+      Pelo teste da razão de Lowe, ficamos só com pares sem ambiguidade.</li>
+    <li><b>RANSAC</b>: sorteia repetidamente 4 pares, calcula uma transformação e conta quantos outros pares concordam com ela.
+      Fica a transformação com mais "votos" (<i>inliers</i>), e as correspondências erradas são descartadas.</li>
+    <li><b>Homografia</b>: a transformação é uma matriz 3×3 que leva os pontos de uma foto ao plano da outra.
+      Com ela, as fotos são "costuradas" num mosaico sem duplicar regiões.</li>
+  </ol>
+  <p>Fotos tiradas de pontos de vista muito diferentes não se alinham. A ferramenta, então, forma um mosaico por grupo
+    de fotos compatíveis e mostra tudo na tela: correspondências, inliers e a matriz de cada par.</p>
+
+  <h2><span class="passo-num">3</span>Medir a área no mapa</h2>
+  <p>A área é medida num mapa (OpenStreetMap), não na foto, porque a foto tem perspectiva. Há duas formas de desenhar:</p>
+  <ul>
+    <li><b>Trecho de rua</b>: você traça a linha central da rua ocupada e informa a largura. Área = comprimento × largura.</li>
+    <li><b>Área livre</b>: um polígono para praças e áreas irregulares, com área calculada sobre o elipsoide terrestre.</li>
+  </ul>
+  <p>Divida o evento em <b>zonas</b> com densidades diferentes: perto do palco a multidão é mais compacta, nas pontas
+    é mais rala. Exclua palcos, canteiros, carros de som e trechos vazios. Uma margem de erro (padrão ±10%) acompanha
+    cada área.</p>
+
+  <h2><span class="passo-num">4</span>Medir a densidade nas fotos</h2>
+  <p>Aqui está o coração do método. A densidade é <b>medida em amostras</b>, isto é, trechos da foto onde dá para contar as pessoas.
+    O problema é a perspectiva: quem está longe parece menor. A solução é outra homografia:</p>
+  <svg viewBox="0 0 640 210" role="img" aria-label="Homografia: retângulo em perspectiva vira retângulo visto de cima" style="width:100%;color:var(--acento)">
+    <polygon points="70,170 250,170 210,60 110,60" fill="none" stroke="#e0a800" stroke-width="3"/>
+    <text x="160" y="195" text-anchor="middle" font-size="13" fill="var(--texto)">Na foto (perspectiva)</text>
+    <text x="160" y="50" text-anchor="middle" font-size="12" fill="var(--suave)">carro de som: 3,0 m de largura</text>
+    <path d="M285 115 h70" stroke="currentColor" stroke-width="3" marker-end="url(#seta)"/>
+    <defs><marker id="seta" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
+    <text x="320" y="105" text-anchor="middle" font-size="13" fill="var(--texto)">H</text>
+    <rect x="400" y="50" width="70" height="120" fill="none" stroke="#e0a800" stroke-width="3"/>
+    <g stroke="var(--borda)"><path d="M400 80h70M400 110h70M400 140h70M423 50v120M447 50v120"/></g>
+    <text x="435" y="195" text-anchor="middle" font-size="13" fill="var(--texto)">Visto de cima (metros)</text>
+    <text x="545" y="105" font-size="12" fill="var(--suave)">agora cada</text>
+    <text x="545" y="121" font-size="12" fill="var(--suave)">pixel tem área</text>
+    <text x="545" y="137" font-size="12" fill="var(--suave)">conhecida em m²</text>
+  </svg>
+  <p>Você marca na foto os 4 cantos de um <b>retângulo de tamanho conhecido no chão</b> (carroceria de caminhão, faixa de
+    pedestres, faixas de rolamento, quadra). Com isso a ferramenta calcula a homografia que "desentorta" o chão e converte
+    o polígono da amostra em m². Depois, você conta as cabeças dentro dele:</p>
+  <ul>
+    <li><b>À mão</b>, clicando em cada cabeça. É o padrão-ouro: lento, mas auditável, porque as posições ficam salvas no relatório.</li>
+    <li><b>Com IA</b>: a rede neural DM-Count (NeurIPS 2020) gera um <b>mapa de densidade</b>, uma imagem em que a soma dos pixels
+      é o número de pessoas. Ela roda no seu navegador.</li>
+  </ul>
+  <div class="aviso"><b>A IA não é infalível, e a ferramenta mostra isso.</b> Em fotos panorâmicas, cabeças distantes têm poucos
+    pixels e a IA <b>subconta</b>. Com mãos levantadas, bandeiras e fotos com processamento HDR, ela pode <b>superconta</b>r.
+    Por isso: (1) use a IA em amostras próximas, não na foto inteira; (2) faça o <b>teste de escala</b>, processando a mesma foto
+    em 3 resoluções (números estáveis indicam confiança); (3) compare com uma contagem manual na mesma amostra.</div>
+
+  <h2><span class="passo-num">5</span>Incerteza: dizer quanto o número pode variar</h2>
+  <p>Toda medida tem erro. Em vez de um número "exato" (e falso), a ferramenta faz uma <b>simulação de Monte Carlo</b>:
+    repete a conta 20.000 vezes, sorteando em cada vez uma área dentro da margem de erro e uma densidade entre o mínimo e o
+    máximo informados. O resultado é um <b>intervalo</b> que contém 90% das simulações, por exemplo
+    "entre 60 mil e 95 mil pessoas, mais provável 78 mil". O gerador de números aleatórios usa semente fixa, então qualquer
+    pessoa que importe o mesmo relatório obtém os mesmos números.</p>
+
+  <h2><span class="passo-num">6</span>Checagem física e transparência</h2>
+  <ul>
+    <li><b>Capacidade máxima</b>: área × 4 pessoas/m² dá um teto realista para quem está presente <i>ao mesmo tempo</i>.
+      Números anunciados acima disso exigem área maior ou se referem ao total de pessoas que passaram ao longo do dia
+      (rotatividade), algo que fotos de um instante não medem.</li>
+    <li><b>Relatório completo</b>: o JSON exportado traz o SHA-256 de cada foto, as matrizes de registro, as zonas (coordenadas),
+      as amostras (cantos de referência, polígonos, posições das cabeças), os parâmetros da simulação e o resultado.
+      Quem discordar pode importar o relatório, mudar um parâmetro e mostrar o efeito.</li>
+  </ul>
+
+  <h2>Boas práticas</h2>
+  <ul>
+    <li>Use fotos do <b>horário de pico</b>, de preferência aéreas (drone ou prédios altos), com data e hora conhecidas.</li>
+    <li>Faça <b>várias amostras</b> em pontos diferentes: centro, bordas, perto e longe do palco.</li>
+    <li>Prefira contagem manual nas amostras e use a IA como segunda opinião.</li>
+    <li>Declare as fontes das fotos e suas licenças, e se elas vêm de organizadores, imprensa ou terceiros.</li>
+    <li>Divulgue o <b>intervalo</b>, não só o número central.</li>
+  </ul>
+
+  <h2>Compromisso apartidário</h2>
+  <p>O método, o código e os parâmetros padrão são os mesmos para qualquer evento, seja de esquerda, de direita, religioso,
+    esportivo ou cultural. Não há ajustes "por lado". Toda escolha que muda o resultado (áreas, densidades, fotos) é feita
+    por quem usa a ferramenta e fica registrada no relatório, para escrutínio público.</p>
+
+  <h2>Referências</h2>
+  <ul class="pequeno">
+    <li>Jacobs, H. (1967). To count a crowd. <i>Columbia Journalism Review</i>, 6(1), 37–40.</li>
+    <li>Fruin, J. J. (1971). <i>Pedestrian Planning and Design</i>. Metropolitan Association of Urban Designers and Environmental Planners.</li>
+    <li>Still, G. K. (2014). <i>Introduction to Crowd Science</i>. CRC Press.</li>
+    <li>Watson, R., &amp; Yip, P. (2011). How many were there when it mattered? <i>Significance</i>, 8(3), 104–107.</li>
+    <li>Rublee, E. et al. (2011). ORB: An efficient alternative to SIFT or SURF. <i>ICCV</i>.</li>
+    <li>Fischler, M. A., &amp; Bolles, R. C. (1981). Random sample consensus (RANSAC). <i>Communications of the ACM</i>, 24(6), 381–395.</li>
+    <li>Hartley, R., &amp; Zisserman, A. (2004). <i>Multiple View Geometry in Computer Vision</i>. Cambridge University Press.</li>
+    <li>Wang, B., Liu, H., Samaras, D., &amp; Hoai, M. (2020). Distribution Matching for Crowd Counting (DM-Count). <i>NeurIPS</i>.</li>
+    <li>Idrees, H. et al. (2018). Composition Loss for Counting, Density Map Estimation and Localization in Dense Crowds (UCF-QNRF). <i>ECCV</i>.</li>
+  </ul>
+</main>
+
+<footer><div class="conteudo">Conta Multidão: software livre (MIT). Textos desta página: CC BY 4.0.</div></footer>
+<script type="module">
+  import { desenharGuia } from "./assets/js/densidades.js";
+  desenharGuia(document.getElementById("guia"));
+</script>
+</body>
+</html>

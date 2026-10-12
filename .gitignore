@@ -1,0 +1,7 @@
+.venv/
+__pycache__/
+*.pyc
+docs/modelos/dmcount_qnrf.onnx
+dados/*/originais/
+.DS_Store
+.env

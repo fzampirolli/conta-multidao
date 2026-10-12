@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Conta Multidão — estime o público de manifestações com método aberto</title>
+  <meta name="description" content="Ferramenta gratuita, apartidária e didática para registrar fotos de multidões e estimar o número de pessoas com método científico transparente.">
+  <link rel="icon" href="assets/icone.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+  <link rel="stylesheet" href="assets/css/estilo.css">
+</head>
+<body>
+<header class="topo">
+  <div class="conteudo">
+    <a class="marca" href="./"><img src="assets/icone.svg" alt="" width="30" height="30"> Conta Multidão</a>
+    <nav>
+      <a href="./" aria-current="page">Ferramenta</a>
+      <a href="metodo.html">O método</a>
+      <a href="casos/paulista-2026-10-11.html">Estudo de caso</a>
+      <a href="https://github.com/fzampirolli/conta-multidao">Código aberto</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="heroi">
+    <div>
+      <h1>Quantas pessoas havia lá?</h1>
+      <p class="lead">Estime o público de qualquer manifestação, show ou evento a partir de fotos,
+        com um método científico <b>aberto, verificável e apartidário</b>. Cada número mostra de onde veio.</p>
+      <p class="lead pequeno">A estimativa segue o método clássico de <b>área × densidade</b> (Jacobs, 1967),
+        com amostras medidas nas fotos, contagem por inteligência artificial e margem de incerteza.</p>
+      <div class="grupo-botoes">
+        <a class="botao primario" href="#ferramenta">Começar agora</a>
+        <a class="botao" href="metodo.html">Entender o método (5 min)</a>
+      </div>
+    </div>
+    <div class="figura">
+      <svg viewBox="0 0 420 230" role="img" aria-label="Esquema: total = área vezes densidade">
+        <defs><pattern id="pp" width="14" height="14" patternUnits="userSpaceOnUse"><circle cx="7" cy="7" r="3.2" fill="currentColor" opacity=".55"/></pattern></defs>
+        <g style="color:var(--acento)">
+          <rect x="10" y="40" width="150" height="110" rx="8" fill="url(#pp)" stroke="currentColor" stroke-width="2"/>
+          <text x="85" y="175" text-anchor="middle" font-size="15" fill="var(--texto)">Área ocupada (m²)</text>
+          <text x="85" y="195" text-anchor="middle" font-size="12" fill="var(--suave)">medida no mapa</text>
+          <text x="185" y="105" font-size="30" fill="var(--texto)">×</text>
+          <rect x="220" y="60" width="70" height="70" rx="6" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="5 4"/>
+          <circle cx="238" cy="78" r="5" fill="currentColor"/><circle cx="270" cy="82" r="5" fill="currentColor"/>
+          <circle cx="250" cy="110" r="5" fill="currentColor"/><circle cx="276" cy="116" r="5" fill="currentColor"/>
+          <text x="255" y="160" text-anchor="middle" font-size="15" fill="var(--texto)">Densidade</text>
+          <text x="255" y="180" text-anchor="middle" font-size="12" fill="var(--suave)">pessoas por m²,</text>
+          <text x="255" y="195" text-anchor="middle" font-size="12" fill="var(--suave)">medida nas fotos</text>
+          <text x="310" y="105" font-size="30" fill="var(--texto)">=</text>
+          <text x="375" y="100" text-anchor="middle" font-size="18" font-weight="700" fill="currentColor">Público</text>
+          <text x="375" y="122" text-anchor="middle" font-size="12" fill="var(--suave)">com margem</text>
+          <text x="375" y="137" text-anchor="middle" font-size="12" fill="var(--suave)">de incerteza</text>
+        </g>
+      </svg>
+    </div>
+  </section>
+
+  <section class="principios">
+    <div class="principio"><b>🔒 Privado</b><span>Suas fotos são processadas no seu navegador e não são enviadas a nenhum servidor.</span></div>
+    <div class="principio"><b>🔍 Transparente</b><span>Fórmulas, parâmetros e incertezas aparecem na tela e no relatório exportado.</span></div>
+    <div class="principio"><b>♻️ Reprodutível</b><span>O relatório traz a impressão digital (SHA-256) de cada foto e todos os parâmetros usados.</span></div>
+    <div class="principio"><b>⚖️ Apartidário</b><span>O mesmo método vale para qualquer evento, causa ou lado político.</span></div>
+  </section>
+
+  <section id="ferramenta">
+    <nav class="etapas" aria-label="Etapas">
+      <button data-etapa="fotos" class="ativo">Fotos</button>
+      <button data-etapa="registro">Registro (mosaico)</button>
+      <button data-etapa="area">Área no mapa</button>
+      <button data-etapa="densidade">Densidade nas fotos</button>
+      <button data-etapa="resultado">Resultado</button>
+    </nav>
+
+    <!-- 1. FOTOS -->
+    <div class="painel ativo" id="painel-fotos">
+      <div class="cartao">
+        <h2>1. Envie as fotos do evento</h2>
+        <p>Prefira fotos <b>do alto</b> (drone, prédios) e do <b>horário de pico</b>. Várias fotos do mesmo ponto de vista,
+          com partes em comum, podem ser unidas num único mosaico na etapa seguinte.</p>
+        <label class="soltar" id="soltar">
+          <input type="file" id="entrada-fotos" accept="image/*" multiple hidden>
+          <b>Arraste fotos para cá</b> ou clique para escolher<br>
+          <span class="suave pequeno">JPG/PNG · processadas só no seu computador</span>
+        </label>
+        <div class="grupo-botoes">
+          <button id="carregar-exemplo">Usar fotos de exemplo (Av. Paulista, 11/10/2026)</button>
+        </div>
+        <div class="galeria" id="galeria"></div>
+        <details class="explica">
+          <summary>Por que registrar a impressão digital (hash) de cada foto?</summary>
+          O SHA-256 é uma "impressão digital" do arquivo: qualquer alteração na foto muda o código.
+          Assim, quem ler o relatório pode verificar que a estimativa usou exatamente aquelas imagens.
+        </details>
+      </div>
+    </div>
+
+    <!-- 2. REGISTRO -->
+    <div class="painel" id="painel-registro">
+      <div class="cartao">
+        <h2>2. Registro: juntar as fotos numa só imagem</h2>
+        <p><b>Registro de imagens</b> é alinhar fotos que mostram partes em comum, para formar um <b>mosaico</b>
+          (como um panorama). Assim, a mesma pessoa não é contada duas vezes.</p>
+        <details class="explica">
+          <summary>Como funciona, passo a passo</summary>
+          <ol>
+            <li><b>Pontos de interesse</b>: o computador encontra cantos e detalhes marcantes em cada foto (algoritmo ORB).</li>
+            <li><b>Correspondências</b>: procura o mesmo detalhe nas duas fotos, comparando "assinaturas" numéricas.</li>
+            <li><b>RANSAC</b>: descarta correspondências erradas por sorteios repetidos e fica com as consistentes (<i>inliers</i>).</li>
+            <li><b>Homografia</b>: calcula a matriz 3×3 que leva uma foto ao plano da outra e as funde no mosaico.</li>
+          </ol>
+          Fotos tiradas de pontos muito diferentes, ou sem área em comum, não se alinham. Nesse caso, use-as separadamente.
+        </details>
+        <div class="barra">
+          <label>Começar pela foto: <select id="reg-ref"></select></label>
+          <label>Resolução de trabalho: <select id="reg-res"><option value="1000">1000 px (rápido)</option><option value="1600" selected>1600 px</option><option value="2400">2400 px (detalhado)</option></select></label>
+          <button class="primario" id="reg-rodar">Registrar fotos</button>
+          <span id="reg-status" class="suave pequeno"></span>
+        </div>
+        <div class="progresso"><div id="reg-prog"></div></div>
+        <div id="reg-pares"></div>
+        <h3>Mosaicos</h3>
+        <div id="reg-mosaicos"><p class="suave">Clique em "Registrar fotos".</p></div>
+      </div>
+    </div>
+
+    <!-- 3. ÁREA -->
+    <div class="painel" id="painel-area">
+      <div class="duas-colunas">
+        <div class="cartao">
+          <h2>3. Desenhe no mapa a área ocupada</h2>
+          <div class="barra">
+            <input type="text" id="busca-local" placeholder="Buscar local (ex.: Avenida Paulista)">
+            <button id="buscar">Buscar</button>
+          </div>
+          <div class="barra">
+            <button id="modo-corredor" class="ativo" title="Ideal para ruas e avenidas">✏️ Trecho de rua (linha + largura)</button>
+            <button id="modo-poligono" title="Ideal para praças e áreas irregulares">⬠ Área livre (polígono)</button>
+            <button id="fechar-zona" class="primario">Concluir zona</button>
+            <button id="desfazer-ponto">Desfazer ponto</button>
+          </div>
+          <div id="mapa"></div>
+          <p class="suave pequeno">Clique no mapa para marcar pontos. Divida o evento em <b>zonas</b> de densidade parecida:
+            perto do palco a multidão costuma ser mais densa que nas pontas.</p>
+        </div>
+        <div class="cartao">
+          <h3 style="margin-top:0">Zonas</h3>
+          <div id="lista-zonas" class="pequeno"><p class="suave">Nenhuma zona ainda.</p></div>
+          <details class="explica pequeno">
+            <summary>Dicas de medição</summary>
+            Meça de fachada a fachada só se as calçadas estiverem ocupadas. Não inclua canteiros com árvores,
+            palcos, carros de som, áreas cercadas ou trechos vazios. A margem de erro da área (padrão ±10%)
+            entra no cálculo final.
+          </details>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. DENSIDADE -->
+    <div class="painel" id="painel-densidade">
+      <div class="cartao">
+        <h2>4. Meça a densidade (pessoas por m²) nas fotos</h2>
+        <p>Escolha um trecho representativo da multidão numa foto, informe uma <b>medida real</b> visível
+          (por exemplo, a largura de um carro de som, de uma faixa de pedestres ou de um ônibus)
+          e conte as pessoas dentro dele, à mão ou com a IA.</p>
+        <details class="explica">
+          <summary>Por que preciso de uma medida de referência?</summary>
+          Numa foto em perspectiva, quem está longe parece menor. Marcando os 4 cantos de um
+          <b>retângulo de tamanho conhecido no chão</b>, o site calcula uma homografia que "desentorta" o chão
+          (como se fosse visto de cima) e converte qualquer área da foto em metros quadrados.
+          Bons retângulos: carroceria de caminhão (largura típica de 2,6 a 3,0 m), faixa de pedestres,
+          faixas de rolamento (≈3,5 m), quadras esportivas.
+        </details>
+        <div class="barra">
+          <label>Imagem: <select id="den-imagem"></select></label>
+          <button data-ferr="ref" class="ativo">① Retângulo de referência (4 cantos)</button>
+          <label>largura <input type="number" id="ref-larg" value="3.0" step="0.1" min="0.1"> m</label>
+          <label>comprimento <input type="number" id="ref-comp" value="3.0" step="0.1" min="0.1"> m</label>
+        </div>
+        <div class="barra">
+          <button data-ferr="amostra">② Trecho da amostra (polígono)</button>
+          <button data-ferr="cabecas">③ Contar cabeças (clique)</button>
+          <button id="den-ia">④ Contar com IA</button>
+          <button id="den-limpar">Limpar</button>
+          <label><input type="checkbox" id="den-mapa-calor" checked> mapa de calor</label>
+        </div>
+        <div class="progresso"><div id="den-prog"></div></div>
+        <div class="duas-colunas">
+          <div class="area-trabalho" id="den-area"><canvas id="den-canvas" width="10" height="10"></canvas></div>
+          <div>
+            <div class="kpis" style="grid-template-columns:1fr 1fr">
+              <div class="kpi"><div class="v" id="k-area">—</div><div class="r">área da amostra (m²)</div></div>
+              <div class="kpi"><div class="v" id="k-manual">0</div><div class="r">cabeças marcadas</div></div>
+              <div class="kpi"><div class="v" id="k-ia">—</div><div class="r">contagem IA na amostra</div></div>
+              <div class="kpi"><div class="v" id="k-dens">—</div><div class="r">densidade (pessoas/m²)</div></div>
+            </div>
+            <p class="pequeno suave" id="den-dica">Marque os 4 cantos do retângulo de referência no chão, em ordem (sentido horário).</p>
+            <div class="grupo-botoes"><button class="primario" id="den-salvar" disabled>Salvar amostra</button></div>
+            <h3>Amostras salvas</h3>
+            <div id="lista-amostras" class="pequeno"><p class="suave">Nenhuma amostra ainda.</p></div>
+            <div id="ia-foto-inteira" class="pequeno"></div>
+          </div>
+        </div>
+      </div>
+      <div class="cartao">
+        <h3 style="margin-top:0">Guia visual de densidades</h3>
+        <p class="pequeno suave">Cada quadro mostra uma área de 5 m × 5 m. Use o guia para conferir se as amostras fazem sentido.
+          Acima de 4 pessoas/m² as pessoas ficam espremidas, uma situação de risco.</p>
+        <div class="guia-densidade" id="guia-densidade"></div>
+      </div>
+    </div>
+
+    <!-- 5. RESULTADO -->
+    <div class="painel" id="painel-resultado">
+      <div class="cartao">
+        <h2>5. Resultado</h2>
+        <div id="res-conteudo"><p class="suave">Desenhe ao menos uma zona no mapa (etapa 3) para ver a estimativa.</p></div>
+        <div class="grupo-botoes">
+          <button class="primario" id="res-json">Baixar relatório (JSON)</button>
+          <button id="res-imprimir">Imprimir / salvar PDF</button>
+          <label class="botao">Importar relatório <input type="file" id="res-importar" accept=".json" hidden></label>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="conteudo">
+    Conta Multidão: software livre (licença MIT). Mapas © colaboradores do <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>.
+    IA: modelo DM-Count (Wang et al., NeurIPS 2020) treinado no conjunto UCF-QNRF.
+    As estimativas dependem das fotos e das escolhas de quem usa a ferramenta, e todas ficam registradas no relatório.
+  </div>
+</footer>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<script type="module" src="assets/js/app.js"></script>
+</body>
+</html>
