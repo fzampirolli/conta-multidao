@@ -13,6 +13,7 @@ let fotoAtual = null, esc = 1, zoom = 1;
 let pendentes = []; // pontos clicados na foto à espera do clique no mapa (Ctrl + clique enfileira vários)
 let previsto = null, arrasto = null, ignorarClique = false; // marcador de prévia no mapa; par arrastado na foto
 let desfeitos = {}; // pares removidos por foto, para Refazer
+let medindo = false, medA = null, camadaMedidas; // ferramenta "Medir": 1º ponto pendente na foto
 const cv = () => $("proj-canvas");
 
 /** Pares e homografia da foto (chaveados pelo SHA-256, para sobreviverem a recarregar/importar). */
@@ -52,6 +53,7 @@ function desenharFoto() {
   const gr = geo(fotoAtual);
   gr.pares.forEach((p, i) => marca(g, p.foto, i + 1, gr.residuos?.[i]));
   pendentes.forEach((p, k) => marca(g, p, gr.pares.length + 1 + k, null, true));
+  desenharMedidasFoto(g, gr);
 }
 function marca(g, [x, y], n, res, pend = false) {
   const X = x * esc, Y = y * esc;
@@ -79,6 +81,79 @@ function desenharMapa() {
     }
   });
   listarPares();
+  desenharMedidasMapa(gr);
+}
+
+// ---------- Medir (conferência de escala) ----------
+// Duas margens da rua clicadas na foto → distância pela projeção. A mesma linha aparece no mapa com as pontas
+// arrastáveis: levadas até os meio-fios na ortofoto, dão a distância de referência. O erro mostra se a escala está certa.
+const COR_MEDIDA = "#3fe0ff";
+const distM = (a, b) => { const S = sistema(), p = S.paraMetros(a), q = S.paraMetros(b); return Math.hypot(p[0] - q[0], p[1] - q[1]); };
+function infoMedida(gr, m) {
+  const a = gr.H && paraChao(gr, m.foto[0]), b = gr.H && paraChao(gr, m.foto[1]);
+  const proj = a && b ? distM(a, b) : null, orto = distM(...m.mapa);
+  const meio = [(m.foto[0][0] + m.foto[1][0]) / 2, (m.foto[0][1] + m.foto[1][1]) / 2];
+  return { proj, orto, erro: proj && m.conferida ? (proj - orto) / orto : null, pxm: gr.H ? pxPorMetro(gr.H, meio) : null };
+}
+function desenharMedidasFoto(g, gr) {
+  const medidas = gr.medidas || [];
+  g.lineWidth = 2.5; g.strokeStyle = COR_MEDIDA; g.fillStyle = COR_MEDIDA; g.font = "bold 13px system-ui";
+  medidas.forEach((m, i) => {
+    const [a, b] = m.foto.map(([x, y]) => [x * esc, y * esc]), { proj } = infoMedida(gr, m);
+    g.beginPath(); g.moveTo(...a); g.lineTo(...b); g.stroke();
+    [a, b].forEach((p) => { g.beginPath(); g.arc(...p, 4, 0, 7); g.fill(); });
+    g.fillText(`M${i + 1}${proj ? `: ${fmt(proj, 1)} m` : ""}`, (a[0] + b[0]) / 2 + 6, (a[1] + b[1]) / 2 - 6);
+  });
+  if (medA) { g.beginPath(); g.arc(medA[0] * esc, medA[1] * esc, 5, 0, 7); g.fill(); }
+}
+function desenharMedidasMapa(gr) {
+  camadaMedidas.clearLayers();
+  (gr.medidas || []).forEach((m, i) => {
+    const linha = L.polyline(m.mapa, { color: COR_MEDIDA, weight: 3, dashArray: m.conferida ? null : "6 6" })
+      .bindTooltip(`M${i + 1}`, { permanent: true, direction: "center", className: "rotulo-par" }).addTo(camadaMedidas);
+    m.mapa.forEach((ll, k) => L.marker(ll, { icon: L.divIcon({ className: "marca-medida", iconSize: [14, 14] }), draggable: true,
+      title: "Arraste até o meio-fio na ortofoto" })
+      .on("drag", (e) => { const q = e.target.getLatLng(); m.mapa[k] = [q.lat, q.lng]; linha.setLatLngs(m.mapa); })
+      .on("dragend", () => { m.mapa = m.mapa.map((p) => p.map((v) => +v.toFixed(7))); m.conferida = true; salvarLocal(); desenharFoto(); desenharMapa(); })
+      .addTo(camadaMedidas));
+  });
+  listarMedidas(gr);
+}
+function listarMedidas(gr) {
+  const el = $("proj-medidas"), medidas = gr.medidas || [];
+  if (!medidas.length) { el.innerHTML = medindo ? '<p class="pequeno suave">Nenhuma medida ainda: clique nas duas margens da rua na foto.</p>' : ""; return; }
+  const linhas = medidas.map((m, i) => {
+    const { proj, orto, erro, pxm } = infoMedida(gr, m);
+    const cls = erro == null ? "" : Math.abs(erro) <= 0.05 ? "ok" : Math.abs(erro) > 0.15 ? "erro" : "";
+    return `<tr><td>M${i + 1}</td><td class="num">${pxm ? fmt(pxm, 1) : "—"}</td><td class="num">${proj ? fmt(proj, 1) + " m" : "—"}</td>
+      <td class="num">${m.conferida ? fmt(orto, 1) + " m" : '<span class="suave">arraste as pontas no mapa</span>'}</td>
+      <td class="num ${cls}">${erro == null ? "—" : (erro > 0 ? "+" : "") + fmt(100 * erro, 0) + "%"}</td>
+      <td><button data-del-medida="${i}" title="Apagar medida">🗑</button></td></tr>`;
+  }).join("");
+  el.innerHTML = `<h4 style="margin:.6rem 0 .2rem">📏 Medidas de conferência</h4>
+    <table><tr><th>#</th><th class="num">px/m (perto ↔ longe)</th><th class="num">Pela projeção</th><th class="num">Na ortofoto</th><th class="num">Erro</th><th></th></tr>${linhas}</table>
+    <p class="pequeno suave">Erro até ±5%: escala boa. Acima de ±15%: a projeção distorce ali. Erros que crescem quando o px/m diminui
+    (mais longe da câmera) indicam que o modelo piora com a distância.</p>`;
+  el.querySelectorAll("[data-del-medida]").forEach((b) => (b.onclick = () => { gr.medidas.splice(+b.dataset.delMedida, 1); salvarLocal(); desenharFoto(); desenharMapa(); }));
+}
+function cliqueMedida(p) {
+  const gr = geo(fotoAtual);
+  if (!gr.H) { dica("Para medir, a foto precisa de 4 ou mais pares de controle."); return; }
+  if (!medA) { medA = p; dica("Agora clique na outra margem da rua, na foto."); desenharFoto(); return; }
+  const a = paraChao(gr, medA), b = paraChao(gr, p);
+  if (!a || !b) { medA = null; dica("Um dos pontos caiu acima do horizonte. Clique de novo, nas margens da rua."); desenharFoto(); return; }
+  (gr.medidas ||= []).push({ foto: [medA, p].map((q) => q.map((v) => +v.toFixed(1))), mapa: [a, b].map((q) => q.map((v) => +v.toFixed(7))), conferida: false });
+  medA = null; salvarLocal();
+  mapa.fitBounds(L.latLngBounds([a, b]).pad(0.6), { maxZoom: 20 });
+  dica(`Medida M${gr.medidas.length} pela projeção. Agora arraste as duas pontas da linha tracejada, no mapa, até os meio-fios na ortofoto.`);
+  desenharFoto(); desenharMapa();
+}
+function alternarMedir() {
+  medindo = !medindo; medA = null;
+  $("proj-medir").classList.toggle("ativo", medindo);
+  if (medindo) cancelarPendente();
+  dica(medindo ? "Medir: clique numa margem da rua na foto (meio-fio, borda da calçada) e depois na margem oposta." : "Medição encerrada. Clique num ponto do chão na foto para marcar pares.");
+  desenharFoto(); desenharMapa();
 }
 
 function listarPares() {
@@ -327,6 +402,7 @@ function cliqueFoto(e) {
   if (!fotoAtual) return;
   if (ignorarClique) { ignorarClique = false; return; } // fim de um arrasto, não um clique
   const p = pontoDoMouse(e);
+  if (medindo) { cliqueMedida(p); return; }
   // Ctrl + clique: modo lote. Enfileira vários pontos na foto; depois cada clique no mapa completa o primeiro da fila.
   if (e.ctrlKey || e.metaKey) pendentes.push(p); else pendentes = [p];
   mostrarProximo(true);
@@ -363,6 +439,7 @@ function confirmarPar(latlng) {
 }
 function cliqueMapa(e) {
   if (!fotoAtual) return;
+  if (medindo) { dica("Medindo: clique nas margens da rua na FOTO; no mapa, arraste as pontas da linha até os meio-fios."); return; }
   if (!pendentes.length) { dica("Primeiro clique no ponto na FOTO, depois no mapa."); return; }
   confirmarPar(e.latlng);
 }
@@ -415,7 +492,7 @@ function parSobMouse(e) {
   return melhor;
 }
 function apertarFoto(e) {
-  if (e.button !== 0 || pendentes.length || e.ctrlKey || e.metaKey) return;
+  if (e.button !== 0 || pendentes.length || e.ctrlKey || e.metaKey || medindo) return;
   const i = parSobMouse(e);
   if (i < 0) return;
   arrasto = i; ignorarClique = true; e.preventDefault();
@@ -434,7 +511,8 @@ function soltarFoto() {
 function teclas(e) {
   if (!$("painel-projecao").classList.contains("ativo") || !fotoAtual) return;
   if (["INPUT", "SELECT", "TEXTAREA"].includes(e.target.tagName)) return;
-  if (e.key === "Escape" && pendentes.length) { cancelarPendente(); desenharFoto(); dica("Pontos pendentes cancelados."); }
+  if (e.key === "Escape" && medA) { medA = null; desenharFoto(); dica("Medida cancelada."); }
+  else if (e.key === "Escape" && pendentes.length) { cancelarPendente(); desenharFoto(); dica("Pontos pendentes cancelados."); }
   else if (e.key === "Enter" && pendentes.length && previsto && mapa.hasLayer(previsto)) { e.preventDefault(); confirmarPar(previsto.getLatLng()); }
   else if ((e.ctrlKey || e.metaKey) && (e.key.toLowerCase() === "y" || (e.shiftKey && e.key.toLowerCase() === "z"))) { e.preventDefault(); refazer(); }
   else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "z") { e.preventDefault(); desfazer(); }
@@ -490,6 +568,7 @@ function enquadrar() {
 
 function trocarFoto() {
   fotoAtual = estado.fotos.find((f) => f.id === $("proj-foto").value) || null;
+  medA = null;
   cancelarPendente(); desenharFoto(); desenharMapa();
   enquadrar();
   dica(fotoAtual ? "Clique num ponto do CHÃO na foto (canto de faixa de pedestres, base de poste, quina de calçada) e depois no mesmo ponto no mapa. Use a roda do mouse para ampliar a foto." : "Envie fotos na etapa 1.");
@@ -505,6 +584,7 @@ export function iniciarProjecao() {
   criarCamadasBase(mapa, "orto");
   L.control.scale({ imperial: false }).addTo(mapa);
   camadaPares = L.layerGroup().addTo(mapa);
+  camadaMedidas = L.layerGroup().addTo(mapa);
   mapa.on("click", cliqueMapa);
   cv().addEventListener("click", cliqueFoto);
   cv().addEventListener("mousemove", moverFoto);
@@ -538,6 +618,7 @@ export function iniciarProjecao() {
   $("proj-desfazer").onclick = desfazer;
   $("proj-refazer").onclick = refazer;
   $("proj-restaurar").onclick = restaurar;
+  $("proj-medir").onclick = alternarMedir;
   $("proj-salvar").onclick = () => { baixarRelatorio(); dica("Relatório baixado (pasta Downloads). Para continuar depois, use \"Abrir pontos salvos\"."); };
   $("proj-abrir").onchange = async (e) => {
     if (!e.target.files[0]) return;

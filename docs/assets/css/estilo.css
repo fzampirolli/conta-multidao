@@ -254,3 +254,6 @@ body.processando, body.processando canvas { cursor: progress; }
 @media (max-width: 760px) { .topo .largura { display: none; } }
 /* tabelas largas das páginas de texto rolam dentro de si no celular, sem empurrar a página */
 @media (max-width: 760px) { .artigo table { display: block; overflow-x: auto; } }
+
+/* Pontas arrastáveis das medidas de conferência (etapa 3) */
+.marca-medida { background: #3fe0ff; border: 2px solid #111; border-radius: 2px; cursor: move; box-sizing: border-box; }
