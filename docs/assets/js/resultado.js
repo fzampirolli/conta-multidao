@@ -119,15 +119,22 @@ export function relatorio() {
 
 export function iniciarResultado() {
   ["zonas", "amostras", "importado"].forEach((e) => ouvir(e, () => document.getElementById("painel-resultado").classList.contains("ativo") && desenharResultado()));
-  document.getElementById("res-json").onclick = () => {
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(new Blob([JSON.stringify(relatorio(), null, 2)], { type: "application/json" }));
-    a.download = `relatorio-conta-multidao-${new Date().toISOString().slice(0, 10)}.json`; a.click();
-  };
+  document.getElementById("res-json").onclick = baixarRelatorio;
   document.getElementById("res-imprimir").onclick = () => window.print();
-  document.getElementById("res-importar").onchange = async (e) => {
-    const d = JSON.parse(await e.target.files[0].text());
-    estado.zonas = d.zonas || []; estado.amostras = d.amostras || []; estado.georef = d.georef || estado.georef;
-    salvarLocal(); avisar("importado"); desenharResultado();
-  };
+  document.getElementById("res-importar").onchange = async (e) => { await importarRelatorio(e.target.files[0]); desenharResultado(); };
+}
+
+/** Baixa o relatório completo (zonas, amostras e pares de controle) como JSON. Usado nas etapas 3 e 6. */
+export function baixarRelatorio() {
+  const a = document.createElement("a");
+  const agora = new Date(), data = agora.toISOString().slice(0, 10), hora = agora.toTimeString().slice(0, 5).replace(":", "h");
+  a.href = URL.createObjectURL(new Blob([JSON.stringify(relatorio(), null, 2)], { type: "application/json" }));
+  a.download = `relatorio-conta-multidao-${data}-${hora}.json`; a.click();
+}
+/** Abre um relatório salvo (arquivo JSON) e repõe zonas, amostras e pares de controle. */
+export async function importarRelatorio(arquivo) {
+  const d = JSON.parse(await arquivo.text());
+  estado.zonas = d.zonas || []; estado.amostras = d.amostras || []; estado.georef = d.georef || estado.georef;
+  estado.georefImportado = JSON.parse(JSON.stringify(d.georef || {}));
+  salvarLocal(); avisar("importado");
 }

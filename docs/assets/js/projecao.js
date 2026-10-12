@@ -5,6 +5,7 @@
 import { estado, avisar, ouvir, salvarLocal } from "./estado.js";
 import { homografiaMQ, aplicarH, inverter3, sistemaLocal, contornoCorredor, fmt } from "./matematica.js";
 import { criarCamadasBase } from "./camadas.js";
+import { baixarRelatorio, importarRelatorio } from "./resultado.js";
 
 const $ = (id) => document.getElementById(id);
 let mapa, camadaPares, camadaMosaico = null, marcadorCursor = null, local = null;
@@ -474,6 +475,13 @@ export function iniciarProjecao() {
   $("proj-desfazer").onclick = desfazer;
   $("proj-refazer").onclick = refazer;
   $("proj-restaurar").onclick = restaurar;
+  $("proj-salvar").onclick = () => { baixarRelatorio(); dica("Relatório baixado (pasta Downloads). Para continuar depois, use \"Abrir pontos salvos\"."); };
+  $("proj-abrir").onchange = async (e) => {
+    if (!e.target.files[0]) return;
+    try { await importarRelatorio(e.target.files[0]); desenharFoto(); desenharMapa(); dica(`Pontos abertos de ${e.target.files[0].name}.`); }
+    catch (err) { dica("Não consegui ler esse arquivo: " + err.message); }
+    e.target.value = "";
+  };
   for (const [t, f] of [["−", 1 / 1.5], ["+", 1.5]]) {
     const b = document.createElement("button"); b.textContent = t; b.title = "Zoom na foto";
     b.onclick = () => { zoom = Math.max(0.5, Math.min(8, zoom * f)); desenharFoto(); };
