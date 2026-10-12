@@ -303,7 +303,7 @@ function cliqueMapa(e) {
   confirmarPar(e.latlng);
 }
 /**
- * Restaura os pares originais da foto atual (do relatório importado ou, para as fotos de exemplo,
+ * Recoloca os pares originais que faltam na foto atual (do relatório importado ou, para as fotos de exemplo,
  * do estudo de caso), sem mexer nas outras fotos.
  */
 async function restaurar() {
@@ -313,11 +313,14 @@ async function restaurar() {
     try { orig = (await (await fetch("casos/paulista-2026-10-11/relatorio.json")).json()).georef?.[fotoAtual.hash]; } catch {}
   }
   if (!orig?.pares?.length) { dica("Não há pares originais para esta foto (ela não está no relatório importado nem no estudo de caso)."); return; }
-  const g = geo(fotoAtual);
-  (desfeitos[fotoAtual.hash] ||= []).length = 0;
+  const g = geo(fotoAtual), igual = (a, b) => a.foto[0] === b.foto[0] && a.foto[1] === b.foto[1];
+  // Recoloca só os originais que faltam; os pontos marcados pela pessoa são mantidos.
+  const faltam = orig.pares.filter((o) => !g.pares.some((p) => igual(p, o)));
+  const seus = g.pares.filter((p) => !orig.pares.some((o) => igual(p, o))).length;
   cancelarPendente();
-  g.pares = JSON.parse(JSON.stringify(orig.pares));
-  dica(`Pares originais restaurados: ${g.pares.length} pares. As outras fotos não foram alteradas.`);
+  g.pares = [...JSON.parse(JSON.stringify(faltam)), ...g.pares];
+  dica(faltam.length ? `${faltam.length} pares originais recolocados (numerados primeiro). ${seus ? `Seus ${seus} pontos foram mantidos; apague com 🗑 os que não quiser.` : ""} As outras fotos não foram alteradas.`
+    : "Todos os pares originais já estão nesta foto.");
   parAlterado(g);
 }
 function desfazer() {
