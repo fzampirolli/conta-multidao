@@ -183,16 +183,64 @@ export async function gerarOrtomosaico(mpp = 0.3, pxPorMetroMin = 3, progresso, 
   canvas.getContext("2d").putImageData(saida, 0, 0);
   const bounds = [S.paraLatLon([X0, Y0]), S.paraLatLon([X1, Y1])];
   estado.ortomosaico = { id: "orto", nome: `Ortomosaico (${validos.length} fotos, ${mpp.toFixed(2)} m/px)`, canvas, bounds,
-    metrosPorPixel: mpp, largura: W, altura: Ht, fotos: validos.map((it) => it.f.nome), pxPorMetroMin, recortado: !!mascara };
+    metrosPorPixel: mpp, largura: W, altura: Ht, fotos: validos.map((it) => it.f.nome), pxPorMetroMin, recortado: !!mascara,
+    ...mapaResolucao(melhor, W, Ht, mpp), resolucao: melhor, X0, Y1 };
   return estado.ortomosaico;
+}
+
+// ---------- Mapa de resolução ----------
+// Quantos pixels da foto original cobrem 1 metro de chão. Uma cabeça tem ≈0,2 m e uma pessoa ocupa ≈0,5 m de largura;
+// as classes dizem o que dá para fazer com a imagem naquele trecho.
+export const CLASSES_RESOLUCAO = [
+  { min: 0, cor: [255, 255, 204], rotulo: "menos de 3", uso: "só mostra se há gente (uma pessoa ocupa 1 a 2 px)" },
+  { min: 3, cor: [161, 218, 180], rotulo: "3 a 10", uso: "textura da multidão: densidade só por comparação visual" },
+  { min: 10, cor: [65, 182, 196], rotulo: "10 a 25", uso: "cabeças com 2 a 5 px: a IA pode funcionar, com cautela" },
+  { min: 25, cor: [34, 94, 168], rotulo: "25 ou mais", uso: "cabeças com 5 px ou mais: dá para contar pessoas" },
+];
+const classeDe = (s) => { let k = 0; while (k + 1 < CLASSES_RESOLUCAO.length && s >= CLASSES_RESOLUCAO[k + 1].min) k++; return k; };
+
+function mapaResolucao(melhor, W, Ht, mpp) {
+  const img = new ImageData(W, Ht), d = img.data, area = CLASSES_RESOLUCAO.map(() => 0);
+  for (let o = 0; o < melhor.length; o++) {
+    if (!melhor[o]) continue;
+    const k = classeDe(melhor[o]), [r, g, b] = CLASSES_RESOLUCAO[k].cor;
+    d[4 * o] = r; d[4 * o + 1] = g; d[4 * o + 2] = b; d[4 * o + 3] = 255;
+    area[k] += mpp * mpp;
+  }
+  const canvasResolucao = document.createElement("canvas"); canvasResolucao.width = W; canvasResolucao.height = Ht;
+  canvasResolucao.getContext("2d").putImageData(img, 0, 0);
+  return { canvasResolucao, areaPorClasse: area.map((a) => Math.round(a)) };
+}
+
+function legendaResolucao() {
+  const m = estado.ortomosaico, el = $("proj-legenda");
+  if (!m || $("proj-camada").value !== "resolucao") { el.innerHTML = ""; return; }
+  const total = m.areaPorClasse.reduce((a, b) => a + b, 0) || 1;
+  el.innerHTML = `<table><tr><th></th><th class="num">Pixels da foto por metro</th><th class="num">Área</th><th>O que dá para fazer</th></tr>
+    ${CLASSES_RESOLUCAO.map((c, k) => `<tr><td><span class="amostra-cor" style="background:rgb(${c.cor})"></span></td>
+      <td class="num">${c.rotulo}</td><td class="num">${fmt(m.areaPorClasse[k])} m² (${fmt(100 * m.areaPorClasse[k] / total, 1)}%)</td><td>${c.uso}</td></tr>`).join("")}</table>
+    <p class="pequeno suave">A resolução é a da <b>foto original</b> em cada ponto do chão. O ortomosaico em si tem
+    ${fmt(1 / m.metrosPorPixel, 1)} px/m (${fmt(m.metrosPorPixel, 2)} m/px), suficiente para ver a extensão da multidão,
+    mas não para contar pessoas: nos trechos azuis, meça a densidade na <b>foto original</b> (etapa 5). Passe o mouse no mapa para ver o valor de cada ponto.</p>`;
+}
+
+function mostrarResolucaoNoCursor(e) {
+  const m = estado.ortomosaico;
+  if (!m?.resolucao || $("proj-camada").value !== "resolucao") return;
+  const [gx, gy] = sistema().paraMetros([e.latlng.lat, e.latlng.lng]);
+  const i = Math.floor((gx - m.X0) / m.metrosPorPixel), j = Math.floor((m.Y1 - gy) / m.metrosPorPixel);
+  const s = i >= 0 && j >= 0 && i < m.largura && j < m.altura ? m.resolucao[j * m.largura + i] : 0;
+  if (!s) { mapa.closeTooltip(); return; }
+  mapa.openTooltip(`${fmt(s, 1)} px/m · uma pessoa (0,5 m) ≈ ${fmt(s / 2, 1)} px`, e.latlng, { direction: "top", offset: [0, -8] });
 }
 
 function mostrarMosaicoNoMapa() {
   if (camadaMosaico) mapa.removeLayer(camadaMosaico);
   const m = estado.ortomosaico;
   if (!m) return;
-  camadaMosaico = L.imageOverlay(m.canvas.toDataURL("image/png"), m.bounds, { opacity: +$("proj-opac").value }).addTo(mapa);
-  mapa.fitBounds(m.bounds);
+  const c = $("proj-camada").value === "resolucao" ? m.canvasResolucao : m.canvas;
+  camadaMosaico = L.imageOverlay(c.toDataURL("image/png"), m.bounds, { opacity: +$("proj-opac").value }).addTo(mapa);
+  legendaResolucao();
 }
 
 // ---------- Interação ----------
@@ -265,6 +313,9 @@ export function iniciarProjecao() {
     $("proj-zoom").appendChild(b);
   }
   $("proj-opac").oninput = () => camadaMosaico?.setOpacity(+$("proj-opac").value);
+  $("proj-camada").onchange = mostrarMosaicoNoMapa;
+  mapa.on("mousemove", mostrarResolucaoNoCursor);
+  mapa.on("mouseout", () => mapa.closeTooltip());
   $("proj-gerar").onclick = async () => {
     const b = $("proj-gerar"); b.disabled = true;
     try {
@@ -273,7 +324,7 @@ export function iniciarProjecao() {
       $("proj-status").innerHTML = `<span class="ok">${m.nome}</span>: ${m.largura}×${m.altura} px, cobrindo ${fmt(m.largura * m.metrosPorPixel)} × ${fmt(m.altura * m.metrosPorPixel)} m.
         Ele aparece no mapa ao lado e na etapa "Área", e pode ser usado na etapa "Densidade" (já em escala, sem retângulo de referência).`;
       $("proj-baixar").disabled = false;
-      mostrarMosaicoNoMapa(); avisar("ortomosaico");
+      mostrarMosaicoNoMapa(); mapa.fitBounds(m.bounds); avisar("ortomosaico");
     } catch (e) { $("proj-status").innerHTML = `<span class="erro">${e.message}</span>`; console.error(e); }
     b.disabled = false;
   };

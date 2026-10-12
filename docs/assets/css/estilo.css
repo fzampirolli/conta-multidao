@@ -194,3 +194,4 @@ footer .conteudo { max-width: 1180px; margin: auto; }
 .area-trabalho.vazia canvas { display: none; }
 .area-trabalho.vazia::after { content: "Nenhuma imagem ainda. Envie fotos na etapa 1 ou use as fotos de exemplo."; color: var(--suave); padding: 1rem; text-align: center; }
 @media (max-width: 600px) { .guia-densidade { grid-template-columns: 1fr 1fr; } }
+.amostra-cor { display: inline-block; width: 1.1em; height: 1.1em; border-radius: 3px; border: 1px solid var(--borda); vertical-align: middle; }

@@ -232,6 +232,20 @@ export async function registrar() {
       (fora.length ? ` Sem sobreposição suficiente (use separadamente): foto(s) ${fora.join(", ")}.` : "")
     : "Nenhum par de fotos se alinhou. As fotos precisam mostrar partes em comum, do mesmo ponto de vista.");
   if (!estado.mosaicos.length) saidaDiv.innerHTML = '<p class="suave">Nenhum mosaico.</p>';
+  // Grupos separados são normais quando as fotos vêm de pontos de vista diferentes: a junção é feita no mapa.
+  if (estado.mosaicos.length + fora.length > 1) {
+    const av = document.createElement("div");
+    av.className = "aviso";
+    av.innerHTML = `<b>As fotos formaram ${estado.mosaicos.length + fora.length} grupos separados.</b>
+      Isso é esperado quando elas foram tiradas de pontos de vista diferentes (por exemplo, olhando em sentidos opostos da rua,
+      ou de alturas diferentes): a mesma cena aparece de outro ângulo, objetos próximos e distantes se deslocam de forma diferente
+      (paralaxe) e uma única homografia entre duas fotos não consegue alinhá-las.
+      <br>Para juntar os grupos, use a <a href="#projecao" data-ir="projecao">etapa 3 (Projeção no mapa)</a>: lá cada foto é
+      alinhada com o <b>chão</b> do mapa, que é a referência comum a todas. O chão é praticamente plano, e para um plano a homografia vale
+      mesmo com câmeras em posições diferentes.`;
+    av.querySelector("[data-ir]").onclick = (e) => { e.preventDefault(); document.querySelector('.etapas button[data-etapa="projecao"]').click(); };
+    saidaDiv.prepend(av);
+  }
   avisar("mosaico");
 }
 

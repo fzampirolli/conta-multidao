@@ -112,7 +112,8 @@
             <li><b>RANSAC</b>: descarta correspondências erradas por sorteios repetidos e fica com as consistentes (<i>inliers</i>).</li>
             <li><b>Homografia</b>: calcula a matriz 3×3 que leva uma foto ao plano da outra e as funde no mosaico.</li>
           </ol>
-          Fotos tiradas de pontos muito diferentes, ou sem área em comum, não se alinham. Nesse caso, use-as separadamente.
+          Fotos tiradas de pontos muito diferentes, ou sem área em comum, não se alinham entre si e formam mosaicos separados.
+          Elas podem ser unidas na etapa 3, projetando cada uma sobre o mapa.
         </details>
         <div class="barra">
           <label>Começar pela foto: <select id="reg-ref"></select></label>
@@ -165,10 +166,20 @@
           <label><input type="checkbox" id="proj-recorte"> recortar às zonas desenhadas (etapa 4)</label>
           <button class="primario" id="proj-gerar">Gerar ortomosaico</button>
           <button id="proj-baixar" disabled>Baixar PNG</button>
+          <label>Mostrar: <select id="proj-camada" style="width:auto"><option value="fotos">fotos projetadas</option><option value="resolucao">mapa de resolução (px/m)</option></select></label>
           <label>Opacidade <input type="range" id="proj-opac" min="0" max="1" step="0.05" value="0.9"></label>
         </div>
         <div class="progresso"><div id="proj-prog"></div></div>
         <p class="pequeno" id="proj-status"></p>
+        <details class="explica">
+          <summary>O que é o mapa de resolução</summary>
+          Uma foto oblíqua não tem o mesmo detalhe em todo lugar: perto da câmera, 1 metro de chão ocupa dezenas de pixels;
+          perto do horizonte, menos de um. O mapa de resolução pinta cada ponto do chão conforme <b>quantos pixels da foto
+          cobrem 1 metro</b> ali (na foto de melhor resolução naquele ponto). Como uma pessoa ocupa cerca de 0,5 m e uma cabeça
+          cerca de 0,2 m, isso mostra onde é possível contar pessoas, onde só dá para comparar a textura da multidão e onde
+          a foto só indica que há gente. Use-o para escolher onde colocar as amostras de densidade (etapa 5).
+        </details>
+        <div id="proj-legenda" class="rolagem"></div>
       </div>
     </div>
 
