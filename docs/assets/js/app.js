@@ -52,6 +52,7 @@ if (param) {
   if (url.origin === location.origin) {
     fetch(url).then((r) => r.json()).then((d) => {
       estado.zonas = d.zonas || []; estado.amostras = d.amostras || []; estado.georef = d.georef || estado.georef;
+      estado.georefImportado = JSON.parse(JSON.stringify(d.georef || {})); // cópia intacta, para "Restaurar pares"
       avisar("importado");
       document.getElementById("ferramenta").scrollIntoView();
       irPara("resultado");

@@ -302,6 +302,24 @@ function cliqueMapa(e) {
   if (!pendentes.length) { dica("Primeiro clique no ponto na FOTO, depois no mapa."); return; }
   confirmarPar(e.latlng);
 }
+/**
+ * Restaura os pares originais da foto atual (do relatório importado ou, para as fotos de exemplo,
+ * do estudo de caso), sem mexer nas outras fotos.
+ */
+async function restaurar() {
+  if (!fotoAtual) return;
+  let orig = estado.georefImportado?.[fotoAtual.hash];
+  if (!orig) {
+    try { orig = (await (await fetch("casos/paulista-2026-10-11/relatorio.json")).json()).georef?.[fotoAtual.hash]; } catch {}
+  }
+  if (!orig?.pares?.length) { dica("Não há pares originais para esta foto (ela não está no relatório importado nem no estudo de caso)."); return; }
+  const g = geo(fotoAtual);
+  (desfeitos[fotoAtual.hash] ||= []).length = 0;
+  cancelarPendente();
+  g.pares = JSON.parse(JSON.stringify(orig.pares));
+  dica(`Pares originais restaurados: ${g.pares.length} pares. As outras fotos não foram alteradas.`);
+  parAlterado(g);
+}
 function desfazer() {
   if (!fotoAtual) return;
   if (pendentes.length) { pendentes.pop(); mostrarProximo(false); desenharFoto(); return; } // primeiro tira da fila
@@ -452,6 +470,7 @@ export function iniciarProjecao() {
   sel.onchange = trocarFoto;
   $("proj-desfazer").onclick = desfazer;
   $("proj-refazer").onclick = refazer;
+  $("proj-restaurar").onclick = restaurar;
   for (const [t, f] of [["−", 1 / 1.5], ["+", 1.5]]) {
     const b = document.createElement("button"); b.textContent = t; b.title = "Zoom na foto";
     b.onclick = () => { zoom = Math.max(0.5, Math.min(8, zoom * f)); desenharFoto(); };
