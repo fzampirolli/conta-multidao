@@ -141,11 +141,35 @@ function selecionar(f) {
   }[f]);
 }
 
+/**
+ * Ampulheta sobre a foto enquanto a IA processa. Devolve uma função de progresso (0 a 1)
+ * e uma de encerrar. Mostra a porcentagem e o tempo decorrido.
+ */
+function ampulheta(titulo) {
+  const area = $("den-area"), el = document.createElement("div"), t0 = Date.now();
+  el.className = "ampulheta"; el.setAttribute("role", "status"); el.setAttribute("aria-live", "polite");
+  el.innerHTML = `<div><div class="icone" aria-hidden="true">⏳</div><div class="titulo">${titulo}</div><div class="det">0%</div></div>`;
+  const cobrir = () => Object.assign(el.style, { top: `${area.scrollTop}px`, left: `${area.scrollLeft}px`, width: `${area.clientWidth}px`, height: `${area.clientHeight}px` });
+  cobrir(); area.appendChild(el); area.addEventListener("scroll", cobrir); window.addEventListener("resize", cobrir);
+  document.body.classList.add("processando");
+  let p = 0;
+  const atualizar = () => { const s = Math.round((Date.now() - t0) / 1000); el.querySelector(".det").textContent = `${Math.round(p * 100)}% · ${s} s`; };
+  const relogio = setInterval(atualizar, 1000);
+  return {
+    progresso: (v) => { p = v; $("den-prog").style.width = `${Math.round(v * 100)}%`; atualizar(); },
+    titulo: (t) => (el.querySelector(".titulo").textContent = t),
+    fim: () => {
+      clearInterval(relogio); el.remove(); area.removeEventListener("scroll", cobrir); window.removeEventListener("resize", cobrir);
+      document.body.classList.remove("processando");
+    },
+  };
+}
+
 async function rodarIA() {
   const f = fonteImagem(imgId);
   if (!f) return;
   const b = $("den-ia"); b.disabled = true;
-  const prog = (p) => ($("den-prog").style.width = `${Math.round(p * 100)}%`);
+  const amp = ampulheta("Contando pessoas com IA…"), prog = amp.progresso;
   try {
     ia = await contarIA(f, 2048, imgId, prog, dica);
     calor = mapaDeCalor(ia);
@@ -158,22 +182,27 @@ async function rodarIA() {
       <div id="res-escala"></div></div>`;
     $("teste-escala").onclick = testeEscala;
   } catch (e) { dica("Erro na IA: " + e.message); console.error(e); }
-  b.disabled = false; desenhar();
+  amp.fim(); b.disabled = false; desenhar();
 }
 
 async function testeEscala() {
-  const f = fonteImagem(imgId), el = $("res-escala");
-  const prog = (p) => ($("den-prog").style.width = `${Math.round(p * 100)}%`);
+  const f = fonteImagem(imgId), el = $("res-escala"), bt = $("teste-escala"), bi = $("den-ia");
+  bt.disabled = bi.disabled = true;
+  const amp = ampulheta("Teste de escala com IA…"), lados = [1024, 2048, 3072];
   const linhas = [];
-  for (const lado of [1024, 2048, 3072]) {
-    el.innerHTML = `Processando a ${lado} px…`;
-    const r = await contarIA(f, lado, imgId, prog);
-    const naAmostra = poliFechado ? somarNoPoligono(r, poli, dentro) : null;
-    linhas.push(`<tr><td>${lado} px</td><td class="num">${fmt(r.total)}</td><td class="num">${naAmostra != null ? fmt(naAmostra) : "—"}</td></tr>`);
-    el.innerHTML = `<table><tr><th>Escala</th><th class="num">Total</th><th class="num">Na amostra</th></tr>${linhas.join("")}</table>`;
-  }
-  el.innerHTML += `<p class="pequeno">Se os números <b>mudam muito</b> com a escala, a IA não está "enxergando" bem as pessoas
-    (cabeças pequenas demais). Valores <b>estáveis</b> indicam medição confiável naquele trecho.</p>`;
+  try {
+    for (const [k, lado] of lados.entries()) {
+      el.innerHTML = `Processando a ${lado} px…`;
+      amp.titulo(`Teste de escala com IA: ${lado} px (${k + 1} de ${lados.length})…`);
+      const r = await contarIA(f, lado, imgId, (p) => amp.progresso((k + p) / lados.length));
+      const naAmostra = poliFechado ? somarNoPoligono(r, poli, dentro) : null;
+      linhas.push(`<tr><td>${lado} px</td><td class="num">${fmt(r.total)}</td><td class="num">${naAmostra != null ? fmt(naAmostra) : "—"}</td></tr>`);
+      el.innerHTML = `<table><tr><th>Escala</th><th class="num">Total</th><th class="num">Na amostra</th></tr>${linhas.join("")}</table>`;
+    }
+    el.innerHTML += `<p class="pequeno">Se os números <b>mudam muito</b> com a escala, a IA não está "enxergando" bem as pessoas
+      (cabeças pequenas demais). Valores <b>estáveis</b> indicam medição confiável naquele trecho.</p>`;
+  } catch (e) { el.innerHTML += `<p class="erro">Erro na IA: ${e.message}</p>`; console.error(e); }
+  amp.fim(); bt.disabled = bi.disabled = false;
 }
 
 function salvar() {

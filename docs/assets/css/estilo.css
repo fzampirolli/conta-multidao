@@ -231,3 +231,13 @@ kbd { font: .8em ui-monospace, monospace; border: 1px solid var(--borda); border
   color: var(--suave); background: var(--cartao); border: 1px solid var(--borda); border-radius: 4px; padding: 0 .5rem; }
 .alca-altura:hover, .alca-altura.ativo { background: linear-gradient(var(--acento), var(--acento)) center / 100% 4px no-repeat; }
 #proj-trabalho:fullscreen .alca-altura { display: none; }
+
+/* Ampulheta enquanto a IA processa (etapa 5) */
+.ampulheta { position: absolute; z-index: 5; display: grid; place-items: center; text-align: center; color: #fff;
+  background: rgba(11, 15, 20, .6); backdrop-filter: blur(1px); border-radius: 10px; }
+.ampulheta .icone { font-size: 3.2rem; display: inline-block; animation: virar-ampulheta 2.4s ease-in-out infinite; }
+.ampulheta .titulo { font-weight: 700; margin-top: .4rem; }
+.ampulheta .det { font-variant-numeric: tabular-nums; opacity: .85; margin-top: .2rem; }
+@keyframes virar-ampulheta { 0%, 40% { transform: rotate(0); } 50%, 90% { transform: rotate(180deg); } 100% { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .ampulheta .icone { animation: none; } }
+body.processando, body.processando canvas { cursor: progress; }
