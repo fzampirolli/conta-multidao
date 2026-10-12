@@ -23,7 +23,9 @@ Histórico completo da conversa que criou o projeto: `notas/conversa-2026-10-12.
 - Vistas: 3 fotos para o Paraíso (55581805947, 55582830431, 55583249180) e 3 para a Consolação (55583249175, 55583639030, 55583675910).
 - Câmeras calibradas por pontos de fuga (`python/projecao/`, parâmetros em `dados/paulista-2026-10-11/`):
   vista 1 a ≈63 m de altura, ≈100 m antes do MASP; vista 2 a ≈18 m, na ponta SE do MASP.
-- Resultado publicado: de 140 mil a 280 mil pessoas (mediana ≈200 mil); densidade atribuída por classe visual, porque as fotos não permitem contagem individual.
+- Resultado publicado (revisão de 12/10/2026): de 210 mil a 380 mil pessoas (mediana ≈290 mil). Núcleo apoiado em contagem manual com a grade
+  junto ao palanque (4,96 e 1,84/m² no mesmo trecho, em duas fotos); demais zonas por classe visual decrescente; observações de campo do autor
+  (≈2/m² na estação Paulista do metrô; multidões nas transversais, não incluídas). Versão anterior: 140–280 mil.
 
 ## Convenções
 - Textos em português, tom didático e neutro; o mesmo método vale para qualquer lado político.
@@ -34,4 +36,6 @@ Histórico completo da conversa que criou o projeto: `notas/conversa-2026-10-12.
 ## Ideias pendentes
 - Transferir o repositório para uma organização ou domínio neutro (pedido do autor).
 - Fotos independentes (imprensa ou cidadãos, licença aberta) do trecho Augusta–Consolação.
-- Ferramenta de calibração por pontos de fuga dentro do site; mapa de resolução (px/m) do ortomosaico; WebGPU para a IA.
+- Ferramenta de calibração por pontos de fuga dentro do site; WebGPU para a IA.
+- Correção da altura das cabeças (≈1,6 m) na densidade e grade no plano das cabeças (pedida, ainda não feita).
+- Zoom pela roda na aba Projeção ainda desloca a página (na aba Densidade já foi corrigido).

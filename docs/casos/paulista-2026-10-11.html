@@ -29,13 +29,18 @@
 
   <div class="cartao resultado-grande">
     <div class="meio">Estimativa de público presente ao mesmo tempo, num momento de pico registrado pelas fotos aéreas (intervalo de 90%)</div>
-    <div class="faixa">140 mil a 280 mil pessoas</div>
-    <div class="meio">valor mais provável: <b>≈ 200 mil</b> · densidade atribuída por julgamento visual, com incerteza ampla</div>
+    <div class="faixa">210 mil a 380 mil pessoas</div>
+    <div class="meio">valor mais provável: <b>≈ 290 mil</b> · núcleo apoiado em contagem manual; demais trechos por julgamento visual, com incerteza ampla</div>
     <div class="grupo-botoes" style="justify-content:center">
       <a class="botao primario" href="../?relatorio=casos/paulista-2026-10-11/relatorio.json">Abrir na ferramenta e alterar os parâmetros</a>
       <a class="botao" href="paulista-2026-10-11/relatorio.json" download>Baixar relatório (JSON)</a>
     </div>
   </div>
+
+  <div class="aviso"><b>Revisão de 12/10/2026.</b> A primeira versão desta página estimava <b>140 mil a 280 mil</b> pessoas
+    (mediana ≈200 mil), com todas as densidades atribuídas por julgamento visual. Esta revisão incorpora <b>contagens manuais</b>
+    com a grade de contagem junto ao palanque e uma <b>observação de campo</b> do autor, que esteve no ato. As mudanças estão
+    descritas nas seções 5 e 6 e no relatório JSON; a versão anterior continua registrada nas notas do relatório.</div>
 
   <h2>Contexto</h2>
   <p>O ato, chamado pelos organizadores de "Marcha pela Democracia", ocorreu duas semanas antes do segundo turno da eleição presidencial,
@@ -129,8 +134,10 @@
     <b>"LARGURA 3,00 m · COMPRIMENTO 19,70 m"</b>. A largura de 3,0 m corresponde a ≈119 pixels na foto, ou seja, ≈40 px por metro.
     Isso funcionou para a escala. A contagem é que falhou:</p>
   <ul>
-    <li><b>Contagem manual inviável</b>: mesmo no arquivo original (3543 px, obtido no Wikimedia Commons), a compressão JPEG forma blocos
-      de 8×8 pixels e cada pessoa ocupa poucos pixels. Não dá para separar cabeças com segurança.</li>
+    <li><b>Contagem manual difícil, mas possível junto ao palanque</b>: na maior parte das fotos cada pessoa ocupa poucos pixels e a
+      compressão JPEG forma blocos de 8×8 pixels. Nas fotos mais próximas do carro de som, porém, uma <b>grade de contagem</b> com células
+      de 1 m projetadas no chão (pela homografia da etapa 3) permite marcar cabeça por cabeça. Ali, 1 m corresponde a ≈100 px na
+      horizontal, e uma cabeça a ≈20–30 px (≈0,2–0,3 m), o que confere a escala.</li>
     <li><b>IA implausível</b>: nas amostras junto ao caminhão, a IA indicou entre 9 e 15 pessoas/m², acima do limite físico (≈6/m²).
       Mãos levantadas, bandeiras e o tratamento HDR provavelmente foram contados como cabeças.</li>
     <li><b>Teste de escala reprovado</b>: o total da IA muda muito conforme a resolução de processamento (tabela abaixo),
@@ -146,32 +153,48 @@
   </table>
   <p class="pequeno suave">DM-Count com pesos UCF-QNRF, mesmo modelo do site. Apenas a foto mais próxima tem contagem estável,
     e ela mostra só uma fração do núcleo.</p>
-  <p>Diante disso, atribuímos as densidades por <b>comparação visual com o guia de classes</b>, com faixas largas que carregam essa incerteza:</p>
+  <h3>Contagem com a grade junto ao palanque</h3>
+  <p>O mesmo trecho de 5 × 5 m, ao lado do carro de som, foi contado em duas fotos:</p>
   <table>
-    <tr><th>Zona</th><th class="num">Área (m²)</th><th class="num">Densidade mín · provável · máx</th><th>Justificativa visual</th></tr>
-    <tr><td>Núcleo: MASP ± 250 m</td><td class="num">22.499</td><td class="num">2,5 · 3,0 · 4,0</td><td>ombro a ombro junto ao carro de som</td></tr>
-    <tr><td>Augusta → núcleo</td><td class="num">15.332</td><td class="num">1,5 · 2,0 · 3,0</td><td>ocupação contínua da pista e das calçadas</td></tr>
-    <tr><td>Núcleo → J. E. de Lima</td><td class="num">20.831</td><td class="num">1,5 · 2,0 · 3,0</td><td>ocupação contínua</td></tr>
-    <tr><td>Consolação → Augusta</td><td class="num">17.726</td><td class="num">0,5 · 1,2 · 2,0</td><td>visível ao fundo, densidade incerta</td></tr>
-    <tr><td>J. E. de Lima → Brigadeiro</td><td class="num">11.115</td><td class="num">0,5 · 1,2 · 2,0</td><td>visível ao fundo, densidade incerta</td></tr>
-    <tr><td>Brigadeiro → Paraíso</td><td class="num">27.353</td><td class="num">0 · 0,6 · 1,5</td><td>no limite do horizonte, pode estar vazia</td></tr>
+    <tr><th>Foto (Flickr id)</th><th class="num">Área</th><th class="num">Cabeças</th><th class="num">Densidade</th></tr>
+    <tr><td>55583675910 (aérea média)</td><td class="num">25 m²</td><td class="num">124</td><td class="num">4,96/m²</td></tr>
+    <tr><td>55583639030 (aérea próxima)</td><td class="num">25 m²</td><td class="num">46</td><td class="num">1,84/m²</td></tr>
   </table>
+  <p class="pequeno suave">A diferença entre as duas fotos do mesmo lugar mostra quanto a contagem depende do ângulo, da nitidez e de
+    cabeças escondidas atrás de outras. Há ainda um viés para baixo: as cabeças estão ≈1,6 m acima do chão e, com a câmera a ≈18 m,
+    projetá-las no chão espalha as pessoas por uma área ≈20% maior. Gente sob árvores e bandeiras não aparece na contagem, mas está
+    incluída na área das zonas.</p>
+  <p>Com isso, o <b>núcleo</b> recebe 3 · 4 · 5 pessoas/m²: abaixo do ponto mais denso junto ao palanque, porque a zona tem 500 m.
+    As demais zonas não puderam ser medidas (as fotos têm menos de 3 px/m nesses trechos) e recebem valores <b>decrescentes</b> ao
+    se afastar do MASP, por comparação visual, com faixas largas:</p>
+  <table>
+    <tr><th>Zona</th><th class="num">Área (m²)</th><th class="num">Densidade mín · provável · máx</th><th>Base</th></tr>
+    <tr><td>Núcleo: MASP ± 250 m</td><td class="num">22.499</td><td class="num">3 · 4 · 5</td><td>contagem com grade junto ao palanque (1,8 e 5,0/m²)</td></tr>
+    <tr><td>Augusta → núcleo</td><td class="num">15.332</td><td class="num">2 · 3 · 4</td><td>ocupação contínua da pista e das calçadas</td></tr>
+    <tr><td>Núcleo → J. E. de Lima</td><td class="num">20.831</td><td class="num">2 · 3 · 4</td><td>ocupação contínua</td></tr>
+    <tr><td>Consolação → Augusta</td><td class="num">17.726</td><td class="num">1 · 2 · 3</td><td>visível ao fundo; observação de campo: ≈2/m² em frente à estação Paulista do metrô</td></tr>
+    <tr><td>J. E. de Lima → Brigadeiro</td><td class="num">11.115</td><td class="num">1 · 2 · 3</td><td>visível ao fundo, densidade incerta</td></tr>
+    <tr><td>Brigadeiro → Paraíso</td><td class="num">27.353</td><td class="num">0,5 · 1,2 · 2</td><td>no limite do horizonte</td></tr>
+  </table>
+  <p class="pequeno suave"><b>Observações de campo</b> do autor, que esteve no ato: ≈2 pessoas/m² em frente à estação Paulista do metrô
+    e multidões também nas ruas transversais. Sem horário nem foto, entram como apoio, não como medição. Se você tem fotos desses
+    trechos com licença aberta, elas podem virar amostras.</p>
 
   <h2><span class="passo-num">6</span>Resultado e incerteza</h2>
-  <div class="formula">Estimativa pontual = Σ área × densidade provável ≈ 191 mil pessoas
+  <div class="formula">Estimativa pontual = Σ área × densidade provável ≈ 289 mil pessoas
 
 Monte Carlo (20.000 simulações, semente 2026):
-  erros correlacionados entre zonas (padrão):  140 mil a 280 mil · mediana ≈ 200 mil
-  erros independentes (otimista):              180 mil a 230 mil · mediana ≈ 200 mil</div>
-  <p>Como as densidades vêm de julgamento visual, e não de contagem, <b>a faixa é larga</b>. Ela mostra o tamanho real
-    da nossa ignorância, e não uma precisão que não temos.</p>
+  erros correlacionados entre zonas (padrão):  210 mil a 380 mil · mediana ≈ 290 mil
+  erros independentes (otimista):              260 mil a 330 mil · mediana ≈ 290 mil</div>
+  <p>Só o núcleo tem contagem; as outras zonas dependem de julgamento visual. Por isso <b>a faixa é larga</b>. Ela mostra o
+    tamanho real da nossa ignorância, e não uma precisão que não temos.</p>
 
   <h3>Cenários de extensão</h3>
   <table>
     <tr><th>Cenário</th><th class="num">Área (m²)</th><th class="num">Estimativa pontual</th></tr>
-    <tr><td>A. Só Augusta → J. E. de Lima (núcleo + entorno)</td><td class="num">58.662</td><td class="num">≈ 140 mil</td></tr>
-    <tr><td>B. Consolação → Paraíso (adotado)</td><td class="num">114.856</td><td class="num">≈ 191 mil</td></tr>
-    <tr><td>C. B com largura total de fachada a fachada (50 m)</td><td class="num">127.618</td><td class="num">≈ 212 mil</td></tr>
+    <tr><td>A. Só Augusta → J. E. de Lima (núcleo + entorno)</td><td class="num">58.662</td><td class="num">≈ 198 mil</td></tr>
+    <tr><td>B. Consolação → Paraíso (adotado)</td><td class="num">114.856</td><td class="num">≈ 289 mil</td></tr>
+    <tr><td>C. B com largura total de fachada a fachada (50 m)</td><td class="num">127.618</td><td class="num">≈ 321 mil</td></tr>
   </table>
 
   <h3>Checagem física</h3>
@@ -179,7 +202,9 @@ Monte Carlo (20.000 simulações, semente 2026):
     (multidão muito apertada) e cerca de <b>820 mil</b> a 6 pessoas/m² (esmagamento). Portanto, <b>1 milhão de pessoas ao mesmo tempo
     não cabe fisicamente na avenida</b>. Números desse porte só seriam possíveis contando ruas vizinhas ou o total de pessoas
     que passaram ao longo do dia (rotatividade), algo que fotos de um instante não medem. Essa checagem vale para qualquer
-    estimativa anunciada para a Paulista, por qualquer grupo.</p>
+    estimativa anunciada para a Paulista, por qualquer grupo. A estimativa adotada (mediana ≈290 mil, densidade média ≈2,5/m²)
+    fica abaixo da capacidade da avenida. Ela também fica acima das contagens independentes divulgadas (USP ≈204 mil, Poder360 ≈228 mil),
+    e a diferença se explica pelas densidades atribuídas fora do núcleo, onde não houve medição.</p>
 
   <h2>Limitações e como melhorar</h2>
   <ul>
@@ -188,6 +213,10 @@ Monte Carlo (20.000 simulações, semente 2026):
     <li>As fotos são de uma única fonte, interessada no resultado. Fotos independentes, de imprensa ou de cidadãos, com
       horário registrado, permitiriam amostras de densidade melhores. <b>Se você tem fotos aéreas do ato e pode liberá-las sob
       licença aberta, a análise pode ser refeita.</b></li>
+    <li><b>Ruas transversais não incluídas</b>: segundo observação de campo do autor, elas também tinham multidões. Como não há fotos
+      desses trechos, eles não entram nas zonas, e a estimativa é conservadora nesse ponto.</li>
+    <li>Fora do núcleo, as densidades não foram medidas. Fotos próximas de outros trechos da avenida permitiriam usar a grade
+      de contagem neles também.</li>
     <li>A estimativa vale para o momento das fotos, não para o dia todo. <b>O horário exato de captura é desconhecido</b>: os arquivos só trazem a data de edição no Lightroom (vários têm o mesmo segundo, 14:03:12, e duas fotos da vista 2 marcam 17:05 e 17:24). Por isso, os mosaicos podem juntar momentos diferentes.</li>
   </ul>
 
