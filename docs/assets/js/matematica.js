@@ -144,15 +144,19 @@ export function triangular(u, min, moda, max) {
  * zonas: [{area, erroArea (fração, ex. 0.1), dMin, dModa, dMax}]
  * Para cada simulação: área ~ Uniforme(A(1-e), A(1+e)); densidade ~ Triangular(min, moda, max).
  * Total = Σ área × densidade.
+ * correlacionado = true: o MESMO sorteio vale para todas as zonas (erros de largura e de julgamento
+ * da densidade costumam afetar todas juntas). É o cenário mais prudente (intervalo mais largo).
  */
-export function monteCarlo(zonas, n = 20000, semente = 2026) {
+export function monteCarlo(zonas, n = 20000, semente = 2026, correlacionado = true) {
   const rnd = aleatorio(semente);
   const tot = new Float64Array(n);
   for (let k = 0; k < n; k++) {
     let s = 0;
+    const uA = rnd(), uD = rnd();
     for (const z of zonas) {
-      const a = z.area * (1 + z.erroArea * (2 * rnd() - 1));
-      const d = triangular(rnd(), z.dMin, z.dModa, z.dMax);
+      const ua = correlacionado ? uA : rnd(), ud = correlacionado ? uD : rnd();
+      const a = z.area * (1 + z.erroArea * (2 * ua - 1));
+      const d = triangular(ud, z.dMin, z.dModa, z.dMax);
       s += a * d;
     }
     tot[k] = s;

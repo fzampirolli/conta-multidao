@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Estudo de caso: Av. Paulista, 11/10/2026 | Conta Multidão</title>
+  <meta name="description" content="Aplicação passo a passo do método Conta Multidão às fotos com licença aberta do ato de 11/10/2026 na Avenida Paulista.">
+  <link rel="icon" href="../assets/icone.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../assets/css/estilo.css">
+</head>
+<body>
+<header class="topo">
+  <div class="conteudo">
+    <a class="marca" href="../"><img src="../assets/icone.svg" alt="" width="30" height="30"> Conta Multidão</a>
+    <nav>
+      <a href="../">Ferramenta</a>
+      <a href="../metodo.html">O método</a>
+      <a href="paulista-2026-10-11.html" aria-current="page">Estudo de caso</a>
+      <a href="https://github.com/fzampirolli/conta-multidao">Código aberto</a>
+    </nav>
+  </div>
+</header>
+
+<main class="artigo">
+  <p class="suave pequeno">Estudo de caso nº 1 · publicado em 12/10/2026 · método v1.0</p>
+  <h1>Avenida Paulista, 11 de outubro de 2026</h1>
+  <p class="lead suave">Aplicamos o método passo a passo ao ato realizado no domingo na Avenida Paulista, em São Paulo,
+    usando apenas fotos com licença aberta. Mostramos o que foi possível medir, o que não foi e por quê.</p>
+
+  <div class="cartao resultado-grande">
+    <div class="meio">Estimativa de público presente no momento da foto aérea de referência (14h03), intervalo de 90%</div>
+    <div class="faixa">140 mil a 280 mil pessoas</div>
+    <div class="meio">valor mais provável: <b>≈ 200 mil</b> · densidade atribuída por julgamento visual, com incerteza ampla</div>
+    <div class="grupo-botoes" style="justify-content:center">
+      <a class="botao primario" href="../?relatorio=casos/paulista-2026-10-11/relatorio.json">Abrir na ferramenta e alterar os parâmetros</a>
+      <a class="botao" href="paulista-2026-10-11/relatorio.json" download>Baixar relatório (JSON)</a>
+    </div>
+  </div>
+
+  <h2>Contexto</h2>
+  <p>O ato, chamado pelos organizadores de "Marcha pela Democracia", ocorreu duas semanas antes do segundo turno da eleição presidencial,
+    com o carro de som em frente ao MASP. As estimativas divulgadas divergem: os organizadores anunciaram <b>1 milhão</b> de participantes,
+    a imprensa noticiou "milhares" e nenhum órgão oficial divulgou contagem. O Monitor do Debate Político (USP) e a More in Common
+    informaram que <b>não puderam estimar</b> o público porque o sobrevoo com drone, necessário ao seu método, não foi autorizado.
+    (<a href="https://www.metropoles.com/colunas/ramiro-brites/lula-usp-ato">Metrópoles</a>,
+    <a href="https://agenciabrasil.ebc.com.br/politica/noticia/2026-10/ato-pela-reeleicao-de-lula-leva-milhares-a-avenida-paulista">Agência Brasil</a>,
+    <a href="https://www.dgabc.com.br/Noticia/4352198/pm-relata-depredacao-tumulto-e-pichacoes-em-dispersao-de-ato-pro-lula-na-paulista">Diário do Grande ABC</a>.)</p>
+  <div class="explica"><b>Nota de imparcialidade.</b> Este estudo aplica o mesmo método e os mesmos parâmetros padrão que usaríamos para
+    qualquer ato, de qualquer orientação. A escolha deste evento se deve apenas a ser o mais recente na Paulista quando o projeto começou.</div>
+
+  <h2><span class="passo-num">1</span>Fotos e proveniência</h2>
+  <p>Fizemos uma busca no Flickr e no Wikimedia Commons por fotos tiradas em 11/10/2026 com licença que permite redistribuição.
+    A <b>única fonte</b> encontrada foi o álbum oficial da campanha (43 fotos, Ricardo Stuckert, CC BY-SA 4.0). Fotos de agências e
+    jornais não têm licença aberta e por isso não são reproduzidas aqui.</p>
+  <div class="aviso"><b>Possível viés de seleção:</b> fotos oficiais de uma campanha tendem a mostrar o melhor ângulo e o momento de maior
+    público. Além disso, elas passaram por tratamento (Lightroom/HDR) e compressão. Usamos 11 delas, sendo 7 aéreas, e a lista
+    completa, com o SHA-256 de cada arquivo, está em <a href="paulista-2026-10-11/fotos.json">fotos.json</a>.</div>
+
+  <h2><span class="passo-num">2</span>Registro: duas vistas, dois mosaicos</h2>
+  <p>As 6 fotos aéreas usadas no exemplo formam <b>dois grupos</b>: um drone olhando para o Paraíso (MASP à esquerda) e outro olhando para
+    a Consolação (MASP à direita). Dentro de cada grupo, o registro encontrou de 314 a 2.342 correspondências consistentes por par, e as
+    fotos foram unidas sem duplicar regiões. Entre os grupos não há sobreposição (os sentidos são opostos), o que o método reconhece.</p>
+  <figure><img src="paulista-2026-10-11/mosaico-1.jpg" alt="Mosaico de 3 fotos aéreas olhando para o Paraíso" loading="lazy">
+    <figcaption>Mosaico 1: 3 fotos registradas (inliers por par: 2.342 e 314). A multidão segue até o horizonte, em direção ao Paraíso.
+      Fotos: Ricardo Stuckert/Lula Oficial, CC BY-SA 4.0.</figcaption></figure>
+  <figure><img src="paulista-2026-10-11/mosaico-2.jpg" alt="Mosaico de 3 fotos aéreas olhando para a Consolação" loading="lazy">
+    <figcaption>Mosaico 2: 3 fotos registradas (inliers por par: 815 e 1.371). Carro de som em frente ao MASP. Fotos: Ricardo Stuckert/Lula Oficial, CC BY-SA 4.0.</figcaption></figure>
+
+  <h2><span class="passo-num">3</span>Área: medida no OpenStreetMap</h2>
+  <ul>
+    <li><b>Comprimento</b>: o eixo da avenida tem 2.745 m no OpenStreetMap, com os cruzamentos localizados pelo próprio mapa
+      (Consolação a 165 m, Augusta a 559 m, MASP a ≈1.150 m, Joaquim Eugênio de Lima a 1.863 m, Brigadeiro a 2.110 m).</li>
+    <li><b>Largura</b>: medimos a distância entre fachadas a cada 10 m, usando os contornos dos prédios no OSM (161 medições):
+      mediana de <b>50,3 m</b> (metade das medições entre 45 e 61 m). Adotamos <b>45 m ± 15%</b> para descontar recuos privados,
+      bancas, canteiros e o carro de som.</li>
+  </ul>
+  <p>Dividimos a avenida em 6 zonas, do núcleo (MASP ± 250 m) às pontas, totalizando 114.856 m² entre a Consolação e o Paraíso.</p>
+
+  <h2><span class="passo-num">4</span>Densidade: o que deu e o que não deu para medir</h2>
+  <p>O plano ideal era medir a densidade em amostras, usando como referência o carro de som, que exibe a placa
+    <b>"LARGURA 3,00 m · COMPRIMENTO 19,70 m"</b>. A largura de 3,0 m corresponde a ≈119 pixels na foto, ou seja, ≈40 px por metro.
+    Isso funcionou para a escala. A contagem é que falhou:</p>
+  <ul>
+    <li><b>Contagem manual inviável</b>: mesmo no arquivo original (3543 px, obtido no Wikimedia Commons), a compressão JPEG forma blocos
+      de 8×8 pixels e cada pessoa ocupa poucos pixels. Não dá para separar cabeças com segurança.</li>
+    <li><b>IA implausível</b>: nas amostras junto ao caminhão, a IA indicou entre 9 e 15 pessoas/m², acima do limite físico (≈6/m²).
+      Mãos levantadas, bandeiras e o tratamento HDR provavelmente foram contados como cabeças.</li>
+    <li><b>Teste de escala reprovado</b>: o total da IA muda muito conforme a resolução de processamento (tabela abaixo),
+      sinal de que o modelo não está "enxergando" as pessoas nessas fotos panorâmicas.</li>
+  </ul>
+  <table>
+    <tr><th>Foto (Flickr id)</th><th class="num">0,5×</th><th class="num">1×</th><th class="num">2×</th><th>Diagnóstico</th></tr>
+    <tr><td>55581805947 (panorâmica)</td><td class="num">50</td><td class="num">692</td><td class="num">3.516</td><td>instável</td></tr>
+    <tr><td>55582830431 (aérea alta)</td><td class="num">556</td><td class="num">4.344</td><td class="num">11.562</td><td>instável</td></tr>
+    <tr><td>55583249180 (aérea alta)</td><td class="num">1.008</td><td class="num">5.618</td><td class="num">14.004</td><td>instável</td></tr>
+    <tr><td>55583675910 (aérea média)</td><td class="num">2.689</td><td class="num">6.907</td><td class="num">11.203</td><td>instável</td></tr>
+    <tr><td>55583639030 (aérea próxima)</td><td class="num">1.784</td><td class="num">2.638</td><td class="num">2.731</td><td class="ok">estável (1×–2×)</td></tr>
+  </table>
+  <p class="pequeno suave">DM-Count com pesos UCF-QNRF, mesmo modelo do site. Apenas a foto mais próxima tem contagem estável,
+    e ela mostra só uma fração do núcleo.</p>
+  <p>Diante disso, atribuímos as densidades por <b>comparação visual com o guia de classes</b>, com faixas largas que carregam essa incerteza:</p>
+  <table>
+    <tr><th>Zona</th><th class="num">Área (m²)</th><th class="num">Densidade mín · provável · máx</th><th>Justificativa visual</th></tr>
+    <tr><td>Núcleo: MASP ± 250 m</td><td class="num">22.499</td><td class="num">2,5 · 3,0 · 4,0</td><td>ombro a ombro junto ao carro de som</td></tr>
+    <tr><td>Augusta → núcleo</td><td class="num">15.332</td><td class="num">1,5 · 2,0 · 3,0</td><td>ocupação contínua da pista e das calçadas</td></tr>
+    <tr><td>Núcleo → J. E. de Lima</td><td class="num">20.831</td><td class="num">1,5 · 2,0 · 3,0</td><td>ocupação contínua</td></tr>
+    <tr><td>Consolação → Augusta</td><td class="num">17.726</td><td class="num">0,5 · 1,2 · 2,0</td><td>visível ao fundo, densidade incerta</td></tr>
+    <tr><td>J. E. de Lima → Brigadeiro</td><td class="num">11.115</td><td class="num">0,5 · 1,2 · 2,0</td><td>visível ao fundo, densidade incerta</td></tr>
+    <tr><td>Brigadeiro → Paraíso</td><td class="num">27.353</td><td class="num">0 · 0,6 · 1,5</td><td>no limite do horizonte, pode estar vazia</td></tr>
+  </table>
+
+  <h2><span class="passo-num">5</span>Resultado e incerteza</h2>
+  <div class="formula">Estimativa pontual = Σ área × densidade provável ≈ 191 mil pessoas
+
+Monte Carlo (20.000 simulações, semente 2026):
+  erros correlacionados entre zonas (padrão):  140 mil a 280 mil · mediana ≈ 200 mil
+  erros independentes (otimista):              180 mil a 230 mil · mediana ≈ 200 mil</div>
+  <p>Como as densidades vêm de julgamento visual, e não de contagem, <b>a faixa é larga</b>. Ela mostra o tamanho real
+    da nossa ignorância, e não uma precisão que não temos.</p>
+
+  <h3>Cenários de extensão</h3>
+  <table>
+    <tr><th>Cenário</th><th class="num">Área (m²)</th><th class="num">Estimativa pontual</th></tr>
+    <tr><td>A. Só Augusta → J. E. de Lima (núcleo + entorno)</td><td class="num">58.662</td><td class="num">≈ 140 mil</td></tr>
+    <tr><td>B. Consolação → Paraíso (adotado)</td><td class="num">114.856</td><td class="num">≈ 191 mil</td></tr>
+    <tr><td>C. B com largura total de fachada a fachada (50 m)</td><td class="num">127.618</td><td class="num">≈ 212 mil</td></tr>
+  </table>
+
+  <h3>Checagem física</h3>
+  <p>A Avenida Paulista inteira, com 2,75 km × 50 m (≈137 mil m²), comportaria cerca de <b>550 mil pessoas</b> a 4 pessoas/m²
+    (multidão muito apertada) e cerca de <b>820 mil</b> a 6 pessoas/m² (esmagamento). Portanto, <b>1 milhão de pessoas ao mesmo tempo
+    não cabe fisicamente na avenida</b>. Números desse porte só seriam possíveis contando ruas vizinhas ou o total de pessoas
+    que passaram ao longo do dia (rotatividade), algo que fotos de um instante não medem. Essa checagem vale para qualquer
+    estimativa anunciada para a Paulista, por qualquer grupo.</p>
+
+  <h2>Limitações e como melhorar</h2>
+  <ul>
+    <li>Sem fotos verticais (do alto, tipo "nadir") em alta resolução, não há contagem individual. Esse é o insumo que o método do
+      Monitor do Debate Político usa e que não esteve disponível.</li>
+    <li>As fotos são de uma única fonte, interessada no resultado. Fotos independentes, de imprensa ou de cidadãos, com
+      horário registrado, permitiriam amostras de densidade melhores. <b>Se você tem fotos aéreas do ato e pode liberá-las sob
+      licença aberta, a análise pode ser refeita.</b></li>
+    <li>A estimativa vale para o horário da foto de referência (14h03), não para o dia todo.</li>
+  </ul>
+
+  <h2>Reproduza</h2>
+  <ol>
+    <li>Abra o <a href="../?relatorio=casos/paulista-2026-10-11/relatorio.json">relatório na ferramenta</a> e altere qualquer largura ou densidade.</li>
+    <li>Carregue as "fotos de exemplo" na etapa 1 e rode o registro e a IA no seu navegador.</li>
+    <li>Confira os scripts em <a href="https://github.com/fzampirolli/conta-multidao/tree/main/python">python/</a>
+      (coleta com proveniência, registro e exportação do modelo).</li>
+  </ol>
+</main>
+
+<footer><div class="conteudo">Fotos: Ricardo Stuckert / Lula Oficial (Flickr), CC BY-SA 4.0. Mapas © colaboradores do OpenStreetMap.
+  Texto e análise: CC BY 4.0, Conta Multidão.</div></footer>
+</body>
+</html>

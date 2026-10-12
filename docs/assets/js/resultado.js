@@ -3,12 +3,13 @@ import { estado, avisar, ouvir, salvarLocal, VERSAO_METODO } from "./estado.js";
 import { monteCarlo, arred, fmt } from "./matematica.js";
 
 const N_SIM = 20000, SEMENTE = 2026;
+let correlacionado = true;
 
 export function calcular() {
   const zonas = estado.zonas.map((z) => ({
     area: z.area, erroArea: z.erroArea, dMin: z.densidade.dMin, dModa: z.densidade.dModa, dMax: z.densidade.dMax,
   }));
-  return zonas.length ? monteCarlo(zonas, N_SIM, SEMENTE) : null;
+  return zonas.length ? monteCarlo(zonas, N_SIM, SEMENTE, correlacionado) : null;
 }
 
 function histograma(r) {
@@ -43,12 +44,14 @@ export function desenharResultado() {
   const areaTot = estado.zonas.reduce((s, z) => s + z.area, 0);
   const cap4 = areaTot * 4, cap6 = areaTot * 6;
   const linhas = estado.zonas.map((z) => {
-    const fonte = z.densidade.fonte === "classe" ? "classe de referência" : z.densidade.fonte === "amostra" ? "amostra medida na foto" : "valor informado";
+    const fonte = z.densidade.fonte === "classe" ? "classe de referência" : z.densidade.fonte === "amostra" ? "amostra medida na foto"
+      : z.densidade.ref ? `julgamento visual (classe "${z.densidade.ref}")` : "valor informado";
     return `<tr><td>${z.nome}</td><td class="num">${fmt(z.area)} ± ${Math.round(z.erroArea * 100)}%</td>
       <td class="num">${z.densidade.dMin} · <b>${z.densidade.dModa}</b> · ${z.densidade.dMax}</td><td>${fonte}</td>
       <td class="num">${fmt(z.area * z.densidade.dModa)}</td></tr>`;
   }).join("");
-  const formula = estado.zonas.map((z) => `  ${z.nome.padEnd(14)} ${fmt(z.area).padStart(10)} m² × ${String(z.densidade.dModa).padStart(4)} pessoas/m² = ${fmt(z.area * z.densidade.dModa).padStart(9)}`).join("\n");
+  const larg = Math.max(...estado.zonas.map((z) => z.nome.length));
+  const formula = estado.zonas.map((z) => `  ${z.nome.padEnd(larg)} ${fmt(z.area).padStart(10)} m² × ${String(z.densidade.dModa).padStart(4)} pessoas/m² = ${fmt(z.area * z.densidade.dModa).padStart(9)}`).join("\n");
   const pontual = estado.zonas.reduce((s, z) => s + z.area * z.densidade.dModa, 0);
   const alertas = [];
   if (estado.zonas.some((z) => z.densidade.dModa > 5)) alertas.push("Há zona com densidade provável acima de 5 pessoas/m², valor raríssimo em grandes áreas (só ocorre em aglomerações perigosas). Confira as amostras.");
@@ -67,12 +70,15 @@ export function desenharResultado() {
       <div class="kpi"><div class="v">${estado.amostras.length}</div><div class="r">amostras medidas nas fotos</div></div>
     </div>
     <h3>Como o número foi calculado</h3>
-    <div class="formula">Total = Σ (área da zona × densidade da zona)\n\n${formula}\n  ${"".padEnd(14)} ${"".padStart(10)}    ${"".padStart(4)}               ${"―".repeat(9)}\n  Estimativa pontual (valores prováveis): ${fmt(pontual)} pessoas</div>
+    <div class="formula">Total = Σ (área da zona × densidade da zona)\n\n${formula}\n  ${"".padEnd(larg)} ${"".padStart(10)}    ${"".padStart(4)}               ${"―".repeat(9)}\n  Estimativa pontual (valores prováveis): ${fmt(pontual)} pessoas</div>
     <table style="margin-top:.8rem"><tr><th>Zona</th><th class="num">Área (m²)</th><th class="num">Densidade mín · provável · máx</th><th>Origem da densidade</th><th class="num">Pessoas (provável)</th></tr>${linhas}</table>
     <h3>Incerteza: simulação de Monte Carlo</h3>
     <p class="pequeno">Repetimos o cálculo ${fmt(N_SIM)} vezes sorteando, em cada zona, uma área dentro da margem de erro
       e uma densidade entre o mínimo e o máximo (distribuição triangular). O histograma mostra os resultados;
       a faixa colorida contém 90% deles. Semente fixa (${SEMENTE}): qualquer pessoa obtém os mesmos números.</p>
+    <label class="pequeno"><input type="checkbox" id="mc-corr" ${correlacionado ? "checked" : ""}>
+      Erros correlacionados entre zonas (recomendado): o mesmo sorteio de largura e de densidade vale para todas as zonas,
+      porque um erro de medida ou de julgamento costuma afetar todas juntas. Desmarque para sorteios independentes (intervalo mais estreito).</label>
     <div id="hist"></div>
     <details class="explica"><summary>Checagem de plausibilidade física</summary>
       Nesta área cabem no máximo cerca de <b>${fmt(arred(cap4))}</b> pessoas a 4/m² (multidão muito apertada), ou
@@ -89,6 +95,7 @@ export function desenharResultado() {
       </ul>
     </details>`;
   el.querySelector("#hist").appendChild(histograma(r));
+  el.querySelector("#mc-corr").onchange = (e) => { correlacionado = e.target.checked; desenharResultado(); };
 }
 
 export function relatorio() {
@@ -96,7 +103,7 @@ export function relatorio() {
   return {
     ferramenta: "Conta Multidão", versaoMetodo: VERSAO_METODO, geradoEm: new Date().toISOString(),
     metodo: "Total = Σ área × densidade (Jacobs); densidade medida em amostras com homografia de referência; incerteza por Monte Carlo (triangular para densidade, uniforme para área).",
-    parametrosSimulacao: { simulacoes: N_SIM, semente: SEMENTE },
+    parametrosSimulacao: { simulacoes: N_SIM, semente: SEMENTE, errosCorrelacionados: correlacionado },
     resultado: r && { p05: Math.round(r.p05), p25: Math.round(r.p25), mediana: Math.round(r.mediana), p75: Math.round(r.p75), p95: Math.round(r.p95) },
     fotos: estado.fotos.map((f) => ({ nome: f.nome, sha256: f.hash, largura: f.largura, altura: f.altura, data: f.data, credito: f.credito, licenca: f.licenca, origem: f.origem })),
     registro: estado.mosaicos.map((m) => ({

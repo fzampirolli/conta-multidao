@@ -1,0 +1,1346 @@
+{
+ "ferramenta": "Conta Multidão",
+ "versaoMetodo": "1.0",
+ "geradoEm": "2026-10-12T12:00:00-03:00",
+ "evento": "Ato na Avenida Paulista, São Paulo (SP), 11/10/2026 — foto aérea de referência às 14:03",
+ "metodo": "Total = Σ área × densidade (Jacobs); área = comprimento do eixo (OSM) × largura; densidade por classe visual (amostras com contagem individual inviáveis nas fotos disponíveis); incerteza por Monte Carlo.",
+ "notas": [
+  "Largura: mediana de 50,3 m entre fachadas (161 medições em contornos de prédios do OpenStreetMap, P25 45,2 m, P75 60,7 m); adotado 45 m ± 15% para descontar recuos privados, bancas, canteiros e o carro de som.",
+  "Comprimentos medidos sobre o eixo da avenida no OpenStreetMap (cruzamentos: Consolação 165 m, Augusta 559 m, J. E. de Lima 1.863 m, Brigadeiro 2.110 m, fim do eixo ≈2.718 m a partir da Av. Angélica/Minas Gerais).",
+  "Densidades atribuídas por comparação visual com o guia de classes; tentativas de amostra com IA resultaram em >9 pessoas/m² (implausível), indicando supercontagem nessas fotos.",
+  "Fotos: única fonte com licença aberta é o álbum oficial da campanha (possível viés de seleção de ângulo e horário)."
+ ],
+ "fotos": [
+  {
+   "nome": "fotos/55583249175.jpg",
+   "sha256": "e12f01be8ea969aeb7b4abf880725761db980dbb0fd2003ddced2add82c501aa",
+   "credito": "Ricardo Stuckert / Lula Oficial (Flickr)",
+   "licenca": "CC BY-SA 4.0",
+   "origem": "https://www.flickr.com/photos/lulaoficial/55583249175",
+   "data": "2026-10-11 14:03:12"
+  },
+  {
+   "nome": "fotos/55583249165.jpg",
+   "sha256": "fe1897a03bc540f486cc14d469b12a39151daaead509fa86ddb27674e6c0d985",
+   "credito": "Ricardo Stuckert / Lula Oficial (Flickr)",
+   "licenca": "CC BY-SA 4.0",
+   "origem": "https://www.flickr.com/photos/lulaoficial/55583249165",
+   "data": "2026-10-11 14:03:12"
+  },
+  {
+   "nome": "fotos/55583249180.jpg",
+   "sha256": "a9b3e2d2a443df6bfb7ac4dc116e121591a807a9b82fad46e6c35e4ea1c78374",
+   "credito": "Ricardo Stuckert / Lula Oficial (Flickr)",
+   "licenca": "CC BY-SA 4.0",
+   "origem": "https://www.flickr.com/photos/lulaoficial/55583249180",
+   "data": "2026-10-11 14:03:12"
+  },
+  {
+   "nome": "fotos/55582830431.jpg",
+   "sha256": "3238891e3e66cadb65f4849b672c8e51724f42e0c4fe6e1a1416c2166bb7759c",
+   "credito": "Ricardo Stuckert / Lula Oficial (Flickr)",
+   "licenca": "CC BY-SA 4.0",
+   "origem": "https://www.flickr.com/photos/lulaoficial/55582830431",
+   "data": "2026-10-11 14:03:12"
+  },
+  {
+   "nome": "fotos/55581805947.jpg",
+   "sha256": "39049d9bab7437ac603555cbf092576fe27095189d8c43a2c61e253f03faf46b",
+   "credito": "Ricardo Stuckert / Lula Oficial (Flickr)",
+   "licenca": "CC BY-SA 4.0",
+   "origem": "https://www.flickr.com/photos/lulaoficial/55581805947",
+   "data": "2026-10-11 14:03:12"
+  },
+  {
+   "nome": "55581822232",
+   "sha256": "d6d226b5efb7296e4bcc4912a181007b63106b4551b04ac9c8402bf00a76d354",
+   "credito": "Ricardo Stuckert / Lula Oficial (Flickr)",
+   "licenca": "CC BY-SA 4.0",
+   "origem": "https://www.flickr.com/photos/lulaoficial/55581822232",
+   "data": "2026-10-11 14:12:52"
+  },
+  {
+   "nome": "fotos/55583038639.jpg",
+   "sha256": "3bd1e59e3438668bb7c0e5630ad468500f39a00e8ccd203505c34bc520c7f773",
+   "credito": "Ricardo Stuckert / Lula Oficial (Flickr)",
+   "licenca": "CC BY-SA 4.0",
+   "origem": "https://www.flickr.com/photos/lulaoficial/55583038639",
+   "data": "2026-10-11 14:12:52"
+  },
+  {
+   "nome": "55582967668",
+   "sha256": "5b7b17b73a9214e20b39d2a01f4d518556f65145292c9b531f0b036a24907496",
+   "credito": "Ricardo Stuckert / Lula Oficial (Flickr)",
+   "licenca": "CC BY-SA 4.0",
+   "origem": "https://www.flickr.com/photos/lulaoficial/55582967668",
+   "data": "2026-10-11 14:12:52"
+  },
+  {
+   "nome": "55582967678",
+   "sha256": "555b55cdab5077e77dfedea3bb76026a9a45fd5774e94a64fe7e82b730b05c3f",
+   "credito": "Ricardo Stuckert / Lula Oficial (Flickr)",
+   "licenca": "CC BY-SA 4.0",
+   "origem": "https://www.flickr.com/photos/lulaoficial/55582967678",
+   "data": "2026-10-11 14:12:52"
+  },
+  {
+   "nome": "55582967703",
+   "sha256": "ccb7aeb6abe29325dfd6ca64ad048613e5a6f39de946549405e4a47c0d7ec99a",
+   "credito": "Ricardo Stuckert / Lula Oficial (Flickr)",
+   "licenca": "CC BY-SA 4.0",
+   "origem": "https://www.flickr.com/photos/lulaoficial/55582967703",
+   "data": "2026-10-11 14:12:52"
+  },
+  {
+   "nome": "fotos/55582967708.jpg",
+   "sha256": "bad83963cab83ade938a0b4cd1a8b3ae62c9f427e2fabc804146de685f1cb83d",
+   "credito": "Ricardo Stuckert / Lula Oficial (Flickr)",
+   "licenca": "CC BY-SA 4.0",
+   "origem": "https://www.flickr.com/photos/lulaoficial/55582967708",
+   "data": "2026-10-11 14:12:52"
+  },
+  {
+   "nome": "55583055864",
+   "sha256": "8aa29695cbbe7de3cced8742207fbe3f9f0bf57fd0d3af413525d672612825ea",
+   "credito": "Ricardo Stuckert / Lula Oficial (Flickr)",
+   "licenca": "CC BY-SA 4.0",
+   "origem": "https://www.flickr.com/photos/lulaoficial/55583055864",
+   "data": "2026-10-11 14:20:46"
+  },
+  {
+   "nome": "55583065099",
+   "sha256": "9f0c0981e3b9b1894d272e342c710d5c2db1072b74418ea4fa1d363123b4a594",
+   "credito": "Ricardo Stuckert / Lula Oficial (Flickr)",
+   "licenca": "CC BY-SA 4.0",
+   "origem": "https://www.flickr.com/photos/lulaoficial/55583065099",
+   "data": "2026-10-11 14:26:04"
+  },
+  {
+   "nome": "55583016996",
+   "sha256": "ceb2a3657f27bf6ae73d9bf543105ee3164cf96e2518ec342e9d284d9306a3ee",
+   "credito": "Ricardo Stuckert / Lula Oficial (Flickr)",
+   "licenca": "CC BY-SA 4.0",
+   "origem": "https://www.flickr.com/photos/lulaoficial/55583016996",
+   "data": "2026-10-11 15:26:41"
+  },
+  {
+   "nome": "55583210679",
+   "sha256": "16f8ea847c1dfa31542e748890b7d39c17c64dcdceb1a2b3daa5b8d17f5eb10c",
+   "credito": "Ricardo Stuckert / Lula Oficial (Flickr)",
+   "licenca": "CC BY-SA 4.0",
+   "origem": "https://www.flickr.com/photos/lulaoficial/55583210679",
+   "data": "2026-10-11 15:26:41"
+  },
+  {
+   "nome": "55583016981",
+   "sha256": "f8a5c056e970901a1efcec1a826c1539231dd2cdd5b21065c525b7b346f2dc96",
+   "credito": "Ricardo Stuckert / Lula Oficial (Flickr)",
+   "licenca": "CC BY-SA 4.0",
+   "origem": "https://www.flickr.com/photos/lulaoficial/55583016981",
+   "data": "2026-10-11 15:26:41"
+  },
+  {
+   "nome": "55583438445",
+   "sha256": "838e1f7a8907fc299bb17ceef436bf8130511e0b867c4c40800255c4ef1d55a8",
+   "credito": "Ricardo Stuckert / Lula Oficial (Flickr)",
+   "licenca": "CC BY-SA 4.0",
+   "origem": "https://www.flickr.com/photos/lulaoficial/55583438445",
+   "data": "2026-10-11 15:26:41"
+  },
+  {
+   "nome": "55581992817",
+   "sha256": "06b28a833ce0ba154d615c6de3d8ca68b31880cafda1241d34b2464ce21750d3",
+   "credito": "Ricardo Stuckert / Lula Oficial (Flickr)",
+   "licenca": "CC BY-SA 4.0",
+   "origem": "https://www.flickr.com/photos/lulaoficial/55581992817",
+   "data": "2026-10-11 15:26:41"
+  },
+  {
+   "nome": "55583227983",
+   "sha256": "a26c0992cb9e0b9fb24599739c354db31fb1c33973cb80c5c97877690ff61767",
+   "credito": "Ricardo Stuckert / Lula Oficial (Flickr)",
+   "licenca": "CC BY-SA 4.0",
+   "origem": "https://www.flickr.com/photos/lulaoficial/55583227983",
+   "data": "2026-10-11 16:09:59"
+  },
+  {
+   "nome": "fotos/55583528625.jpg",
+   "sha256": "53fe4c15ed20c1ad62f35849d07db458363aef267d8308af582468eb057484af",
+   "credito": "Ricardo Stuckert / Lula Oficial (Flickr)",
+   "licenca": "CC BY-SA 4.0",
+   "origem": "https://www.flickr.com/photos/lulaoficial/55583528625",
+   "data": "2026-10-11 16:09:59"
+  },
+  {
+   "nome": "55582081807",
+   "sha256": "93d5f3c0ba7b72c452ef0da94ca33b33d3518ef4c1ddefdb531987bfeac31741",
+   "credito": "Ricardo Stuckert / Lula Oficial (Flickr)",
+   "licenca": "CC BY-SA 4.0",
+   "origem": "https://www.flickr.com/photos/lulaoficial/55582081807",
+   "data": "2026-10-11 16:09:59"
+  },
+  {
+   "nome": "fotos/55583107351.jpg",
+   "sha256": "848e57c81a46b45074077a20b2c73441785db54cb2da46321412bc9317cef1f8",
+   "credito": "Ricardo Stuckert / Lula Oficial (Flickr)",
+   "licenca": "CC BY-SA 4.0",
+   "origem": "https://www.flickr.com/photos/lulaoficial/55583107351",
+   "data": "2026-10-11 16:09:59"
+  },
+  {
+   "nome": "55583301084",
+   "sha256": "16910849d0c53a3657baddc88acbdeacb1d0453bc983fa92f6f85ee18f18a447",
+   "credito": "Ricardo Stuckert / Lula Oficial (Flickr)",
+   "licenca": "CC BY-SA 4.0",
+   "origem": "https://www.flickr.com/photos/lulaoficial/55583301084",
+   "data": "2026-10-11 16:09:59"
+  },
+  {
+   "nome": "55583528765",
+   "sha256": "8bd946197e429776b6d9133201b503c0e68e0e0a0e96e5a7c8081a5630976e7d",
+   "credito": "Ricardo Stuckert / Lula Oficial (Flickr)",
+   "licenca": "CC BY-SA 4.0",
+   "origem": "https://www.flickr.com/photos/lulaoficial/55583528765",
+   "data": "2026-10-11 16:09:59"
+  },
+  {
+   "nome": "55583107531",
+   "sha256": "7f9ca9de072377df6ec0b147f45d02a749348d155b14f430c6d9e32b0341cb5a",
+   "credito": "Ricardo Stuckert / Lula Oficial (Flickr)",
+   "licenca": "CC BY-SA 4.0",
+   "origem": "https://www.flickr.com/photos/lulaoficial/55583107531",
+   "data": "2026-10-11 16:09:59"
+  },
+  {
+   "nome": "55583301099",
+   "sha256": "955d838572ef8d01cddde9ebc4d24388a218cd0d4e38f626e7da996f37fc9805",
+   "credito": "Ricardo Stuckert / Lula Oficial (Flickr)",
+   "licenca": "CC BY-SA 4.0",
+   "origem": "https://www.flickr.com/photos/lulaoficial/55583301099",
+   "data": "2026-10-11 16:09:59"
+  },
+  {
+   "nome": "55583184291",
+   "sha256": "5c505e1a4638cca9e390bbb9e64d3e75bc4bfdf35620e5a835f145a093a0f3e9",
+   "credito": "Ricardo Stuckert / Lula Oficial (Flickr)",
+   "licenca": "CC BY-SA 4.0",
+   "origem": "https://www.flickr.com/photos/lulaoficial/55583184291",
+   "data": "2026-10-11 16:46:17"
+  },
+  {
+   "nome": "55583377299",
+   "sha256": "8e7481c79ae61bc5ab071e34cef7a83029957d574a7556ed7d40961c560b042f",
+   "credito": "Ricardo Stuckert / Lula Oficial (Flickr)",
+   "licenca": "CC BY-SA 4.0",
+   "origem": "https://www.flickr.com/photos/lulaoficial/55583377299",
+   "data": "2026-10-11 16:46:17"
+  },
+  {
+   "nome": "55582157937",
+   "sha256": "e643499b319303637659a9c8104bd74bb896fcba7501d3843d5599035c94a50c",
+   "credito": "Ricardo Stuckert / Lula Oficial (Flickr)",
+   "licenca": "CC BY-SA 4.0",
+   "origem": "https://www.flickr.com/photos/lulaoficial/55582157937",
+   "data": "2026-10-11 16:46:17"
+  },
+  {
+   "nome": "55583184296",
+   "sha256": "21e33962125b8bd92220d860c945d9bd1f1478fdb29604b222a9eaf60e43897f",
+   "credito": "Ricardo Stuckert / Lula Oficial (Flickr)",
+   "licenca": "CC BY-SA 4.0",
+   "origem": "https://www.flickr.com/photos/lulaoficial/55583184296",
+   "data": "2026-10-11 16:46:17"
+  },
+  {
+   "nome": "55582157967",
+   "sha256": "d9667fb996148d2c8ff6ec7a375446c8afa27c41981b134ac7b35ec7be56140d",
+   "credito": "Ricardo Stuckert / Lula Oficial (Flickr)",
+   "licenca": "CC BY-SA 4.0",
+   "origem": "https://www.flickr.com/photos/lulaoficial/55582157967",
+   "data": "2026-10-11 16:46:17"
+  },
+  {
+   "nome": "55582157992",
+   "sha256": "ade0ba82226f654f6312cca39fd4d5ae2ce0f5d3848d59ce73d54446306575d9",
+   "credito": "Ricardo Stuckert / Lula Oficial (Flickr)",
+   "licenca": "CC BY-SA 4.0",
+   "origem": "https://www.flickr.com/photos/lulaoficial/55582157992",
+   "data": "2026-10-11 16:46:17"
+  },
+  {
+   "nome": "55583603905",
+   "sha256": "e472158f2b49910369e07ce672fb94f0655c53266aab6069552d60edfe316714",
+   "credito": "Ricardo Stuckert / Lula Oficial (Flickr)",
+   "licenca": "CC BY-SA 4.0",
+   "origem": "https://www.flickr.com/photos/lulaoficial/55583603905",
+   "data": "2026-10-11 16:46:17"
+  },
+  {
+   "nome": "fotos/55583639030.jpg",
+   "sha256": "6e0fd973986927bd4cff5f1c8a03a0adc9c99c99ceaf16b9dd1678e67f3c4c2d",
+   "credito": "Ricardo Stuckert / Lula Oficial (Flickr)",
+   "licenca": "CC BY-SA 4.0",
+   "origem": "https://www.flickr.com/photos/lulaoficial/55583639030",
+   "data": "2026-10-11 17:05:06"
+  },
+  {
+   "nome": "fotos/55583675910.jpg",
+   "sha256": "df54088ec7268d92c1b36bbb4cfcfb3bd977a7927b553cc2c7c5db7fbfc27c48",
+   "credito": "Ricardo Stuckert / Lula Oficial (Flickr)",
+   "licenca": "CC BY-SA 4.0",
+   "origem": "https://www.flickr.com/photos/lulaoficial/55583675910",
+   "data": "2026-10-11 17:24:47"
+  },
+  {
+   "nome": "55583347126",
+   "sha256": "00855147300b6cd79c974ad0b897256ce1777de9609cb5f9da1ff170725d8575",
+   "credito": "Ricardo Stuckert / Lula Oficial (Flickr)",
+   "licenca": "CC BY-SA 4.0",
+   "origem": "https://www.flickr.com/photos/lulaoficial/55583347126",
+   "data": "2026-10-11 18:11:55"
+  },
+  {
+   "nome": "55583765860",
+   "sha256": "e44ae821230bf4e3d37b26c301bf40d1f06ec2563d3e24694bb282cb1bd7ef1a",
+   "credito": "Ricardo Stuckert / Lula Oficial (Flickr)",
+   "licenca": "CC BY-SA 4.0",
+   "origem": "https://www.flickr.com/photos/lulaoficial/55583765860",
+   "data": "2026-10-11 18:11:55"
+  },
+  {
+   "nome": "55583466508",
+   "sha256": "ab4e77ed38ed4340798cc926b164eed15ec5bc8bc61d547a5dd8524cc77527bb",
+   "credito": "Ricardo Stuckert / Lula Oficial (Flickr)",
+   "licenca": "CC BY-SA 4.0",
+   "origem": "https://www.flickr.com/photos/lulaoficial/55583466508",
+   "data": "2026-10-11 18:11:55"
+  },
+  {
+   "nome": "55582319902",
+   "sha256": "7a9280a4d194e3cb251f167b5fb64197238322d1a0f2108760b939253f766b62",
+   "credito": "Ricardo Stuckert / Lula Oficial (Flickr)",
+   "licenca": "CC BY-SA 4.0",
+   "origem": "https://www.flickr.com/photos/lulaoficial/55582319902",
+   "data": "2026-10-11 18:11:55"
+  },
+  {
+   "nome": "55583466463",
+   "sha256": "003889e2a8e276f4e87e21fc14f1d57b1f2549f69c6886f21fccb59bfedb8cd9",
+   "credito": "Ricardo Stuckert / Lula Oficial (Flickr)",
+   "licenca": "CC BY-SA 4.0",
+   "origem": "https://www.flickr.com/photos/lulaoficial/55583466463",
+   "data": "2026-10-11 18:11:56"
+  },
+  {
+   "nome": "55582319827",
+   "sha256": "68a9158c5612f59956c7fb3b23224b628010ec458e8f35f5f891d3d48dc333a5",
+   "credito": "Ricardo Stuckert / Lula Oficial (Flickr)",
+   "licenca": "CC BY-SA 4.0",
+   "origem": "https://www.flickr.com/photos/lulaoficial/55582319827",
+   "data": "2026-10-11 18:11:56"
+  },
+  {
+   "nome": "55583765780",
+   "sha256": "eced00865bc3943cd198a9f6b903efc931655c09b75c2fa04947063a7e1801e7",
+   "credito": "Ricardo Stuckert / Lula Oficial (Flickr)",
+   "licenca": "CC BY-SA 4.0",
+   "origem": "https://www.flickr.com/photos/lulaoficial/55583765780",
+   "data": "2026-10-11 18:11:56"
+  },
+  {
+   "nome": "55582319872",
+   "sha256": "125828d3a4dbdc3381e3035db1a188f7a525d66ffea61b22fb20b6d6d96ba34b",
+   "credito": "Ricardo Stuckert / Lula Oficial (Flickr)",
+   "licenca": "CC BY-SA 4.0",
+   "origem": "https://www.flickr.com/photos/lulaoficial/55582319872",
+   "data": "2026-10-11 18:11:56"
+  }
+ ],
+ "zonas": [
+  {
+   "id": "z1",
+   "nome": "Núcleo: MASP ± 250 m",
+   "tipo": "corredor",
+   "pontos": [
+    [
+     -23.5604,
+     -46.657614
+    ],
+    [
+     -23.560716,
+     -46.657263
+    ],
+    [
+     -23.561034,
+     -46.656914
+    ],
+    [
+     -23.561351,
+     -46.656565
+    ],
+    [
+     -23.561667,
+     -46.656215
+    ],
+    [
+     -23.561975,
+     -46.655856
+    ],
+    [
+     -23.562261,
+     -46.655476
+    ],
+    [
+     -23.562556,
+     -46.655105
+    ],
+    [
+     -23.562856,
+     -46.654738
+    ],
+    [
+     -23.563168,
+     -46.654383
+    ],
+    [
+     -23.563483,
+     -46.654032
+    ]
+   ],
+   "largura": 45,
+   "area": 22499,
+   "erroArea": 0.15,
+   "densidade": {
+    "fonte": "manual",
+    "ref": "muito",
+    "dMin": 2.5,
+    "dModa": 3.0,
+    "dMax": 4.0
+   }
+  },
+  {
+   "id": "z2",
+   "nome": "Augusta → núcleo",
+   "tipo": "corredor",
+   "pontos": [
+    [
+     -23.558279,
+     -46.660027
+    ],
+    [
+     -23.55862,
+     -46.659705
+    ],
+    [
+     -23.558947,
+     -46.659369
+    ],
+    [
+     -23.559214,
+     -46.658974
+    ],
+    [
+     -23.559518,
+     -46.658612
+    ],
+    [
+     -23.559834,
+     -46.658261
+    ],
+    [
+     -23.560146,
+     -46.657907
+    ],
+    [
+     -23.5604,
+     -46.657614
+    ]
+   ],
+   "largura": 45,
+   "area": 15332,
+   "erroArea": 0.15,
+   "densidade": {
+    "fonte": "manual",
+    "ref": "densa",
+    "dMin": 1.5,
+    "dModa": 2.0,
+    "dMax": 3.0
+   }
+  },
+  {
+   "id": "z3",
+   "nome": "Núcleo → J. E. de Lima",
+   "tipo": "corredor",
+   "pontos": [
+    [
+     -23.563483,
+     -46.654032
+    ],
+    [
+     -23.563782,
+     -46.653665
+    ],
+    [
+     -23.56406,
+     -46.653279
+    ],
+    [
+     -23.56438,
+     -46.652933
+    ],
+    [
+     -23.564701,
+     -46.652587
+    ],
+    [
+     -23.565001,
+     -46.652221
+    ],
+    [
+     -23.5653,
+     -46.651853
+    ],
+    [
+     -23.565604,
+     -46.65149
+    ],
+    [
+     -23.565907,
+     -46.651127
+    ],
+    [
+     -23.566213,
+     -46.650766
+    ],
+    [
+     -23.566295,
+     -46.650674
+    ]
+   ],
+   "largura": 45,
+   "area": 20831,
+   "erroArea": 0.15,
+   "densidade": {
+    "fonte": "manual",
+    "ref": "densa",
+    "dMin": 1.5,
+    "dModa": 2.0,
+    "dMax": 3.0
+   }
+  },
+  {
+   "id": "z4",
+   "nome": "Consolação → Augusta",
+   "tipo": "corredor",
+   "pontos": [
+    [
+     -23.555742,
+     -46.66273
+    ],
+    [
+     -23.55608,
+     -46.662404
+    ],
+    [
+     -23.55642,
+     -46.662082
+    ],
+    [
+     -23.55676,
+     -46.661759
+    ],
+    [
+     -23.557056,
+     -46.661389
+    ],
+    [
+     -23.557353,
+     -46.661019
+    ],
+    [
+     -23.557669,
+     -46.660669
+    ],
+    [
+     -23.557987,
+     -46.660319
+    ],
+    [
+     -23.558279,
+     -46.660027
+    ]
+   ],
+   "largura": 45,
+   "area": 17726,
+   "erroArea": 0.15,
+   "densidade": {
+    "fonte": "manual",
+    "ref": "moderada",
+    "dMin": 0.5,
+    "dModa": 1.2,
+    "dMax": 2.0
+   }
+  },
+  {
+   "id": "z5",
+   "nome": "J. E. de Lima → Brigadeiro",
+   "tipo": "corredor",
+   "pontos": [
+    [
+     -23.566295,
+     -46.650674
+    ],
+    [
+     -23.566609,
+     -46.650322
+    ],
+    [
+     -23.566916,
+     -46.649962
+    ],
+    [
+     -23.567215,
+     -46.649595
+    ],
+    [
+     -23.567512,
+     -46.649224
+    ],
+    [
+     -23.567786,
+     -46.648872
+    ]
+   ],
+   "largura": 45,
+   "area": 11115,
+   "erroArea": 0.15,
+   "densidade": {
+    "fonte": "manual",
+    "ref": "moderada",
+    "dMin": 0.5,
+    "dModa": 1.2,
+    "dMax": 2.0
+   }
+  },
+  {
+   "id": "z6",
+   "nome": "Brigadeiro → Paraíso",
+   "tipo": "corredor",
+   "pontos": [
+    [
+     -23.567786,
+     -46.648872
+    ],
+    [
+     -23.568075,
+     -46.648496
+    ],
+    [
+     -23.568364,
+     -46.648119
+    ],
+    [
+     -23.568651,
+     -46.64774
+    ],
+    [
+     -23.568935,
+     -46.647359
+    ],
+    [
+     -23.569223,
+     -46.64698
+    ],
+    [
+     -23.569512,
+     -46.646603
+    ],
+    [
+     -23.569793,
+     -46.646219
+    ],
+    [
+     -23.570068,
+     -46.645831
+    ],
+    [
+     -23.570348,
+     -46.645446
+    ],
+    [
+     -23.57064,
+     -46.645072
+    ],
+    [
+     -23.570933,
+     -46.644698
+    ],
+    [
+     -23.571253,
+     -46.644353
+    ],
+    [
+     -23.571304,
+     -46.644298
+    ]
+   ],
+   "largura": 45,
+   "area": 27353,
+   "erroArea": 0.15,
+   "densidade": {
+    "fonte": "manual",
+    "ref": "esparsa",
+    "dMin": 0,
+    "dModa": 0.6,
+    "dMax": 1.5
+   }
+  }
+ ],
+ "amostras": [],
+ "medicoesLargura": [
+  [
+   130,
+   29.5
+  ],
+  [
+   140,
+   28.8
+  ],
+  [
+   150,
+   18.4
+  ],
+  [
+   160,
+   18.3
+  ],
+  [
+   170,
+   18.2
+  ],
+  [
+   190,
+   49.6
+  ],
+  [
+   200,
+   16.6
+  ],
+  [
+   210,
+   10.3
+  ],
+  [
+   220,
+   10.3
+  ],
+  [
+   230,
+   10.3
+  ],
+  [
+   240,
+   10.3
+  ],
+  [
+   250,
+   10.4
+  ],
+  [
+   260,
+   10.5
+  ],
+  [
+   270,
+   10.6
+  ],
+  [
+   280,
+   10.8
+  ],
+  [
+   290,
+   10.9
+  ],
+  [
+   300,
+   25.7
+  ],
+  [
+   310,
+   25.7
+  ],
+  [
+   320,
+   25.7
+  ],
+  [
+   330,
+   25.7
+  ],
+  [
+   340,
+   25.7
+  ],
+  [
+   350,
+   25.7
+  ],
+  [
+   360,
+   25.7
+  ],
+  [
+   370,
+   25.7
+  ],
+  [
+   380,
+   25.6
+  ],
+  [
+   390,
+   25.6
+  ],
+  [
+   400,
+   25.6
+  ],
+  [
+   410,
+   25.6
+  ],
+  [
+   420,
+   25.6
+  ],
+  [
+   430,
+   10.6
+  ],
+  [
+   440,
+   38.7
+  ],
+  [
+   450,
+   38.7
+  ],
+  [
+   460,
+   38.6
+  ],
+  [
+   470,
+   30.2
+  ],
+  [
+   480,
+   38.5
+  ],
+  [
+   490,
+   47.8
+  ],
+  [
+   510,
+   54.6
+  ],
+  [
+   520,
+   54.4
+  ],
+  [
+   530,
+   54.3
+  ],
+  [
+   550,
+   75.6
+  ],
+  [
+   560,
+   78.9
+  ],
+  [
+   570,
+   55.3
+  ],
+  [
+   580,
+   46.4
+  ],
+  [
+   590,
+   46.5
+  ],
+  [
+   600,
+   46.5
+  ],
+  [
+   610,
+   46.5
+  ],
+  [
+   650,
+   47.0
+  ],
+  [
+   660,
+   47.1
+  ],
+  [
+   690,
+   70.6
+  ],
+  [
+   700,
+   53.4
+  ],
+  [
+   710,
+   62.7
+  ],
+  [
+   730,
+   52.6
+  ],
+  [
+   780,
+   59.4
+  ],
+  [
+   790,
+   59.0
+  ],
+  [
+   830,
+   77.7
+  ],
+  [
+   840,
+   60.5
+  ],
+  [
+   850,
+   60.7
+  ],
+  [
+   880,
+   53.6
+  ],
+  [
+   890,
+   45.2
+  ],
+  [
+   900,
+   81.2
+  ],
+  [
+   920,
+   44.9
+  ],
+  [
+   930,
+   53.6
+  ],
+  [
+   940,
+   53.7
+  ],
+  [
+   1150,
+   89.9
+  ],
+  [
+   1160,
+   45.7
+  ],
+  [
+   1170,
+   60.7
+  ],
+  [
+   1180,
+   51.1
+  ],
+  [
+   1190,
+   52.6
+  ],
+  [
+   1200,
+   61.6
+  ],
+  [
+   1210,
+   56.4
+  ],
+  [
+   1220,
+   56.5
+  ],
+  [
+   1230,
+   53.5
+  ],
+  [
+   1260,
+   48.7
+  ],
+  [
+   1300,
+   47.9
+  ],
+  [
+   1310,
+   48.0
+  ],
+  [
+   1320,
+   48.0
+  ],
+  [
+   1340,
+   46.4
+  ],
+  [
+   1350,
+   46.8
+  ],
+  [
+   1360,
+   48.8
+  ],
+  [
+   1370,
+   75.2
+  ],
+  [
+   1390,
+   50.2
+  ],
+  [
+   1470,
+   78.8
+  ],
+  [
+   1480,
+   78.7
+  ],
+  [
+   1490,
+   78.7
+  ],
+  [
+   1510,
+   65.0
+  ],
+  [
+   1520,
+   56.4
+  ],
+  [
+   1540,
+   81.4
+  ],
+  [
+   1550,
+   75.3
+  ],
+  [
+   1560,
+   45.2
+  ],
+  [
+   1580,
+   65.0
+  ],
+  [
+   1600,
+   57.5
+  ],
+  [
+   1610,
+   67.5
+  ],
+  [
+   1620,
+   77.6
+  ],
+  [
+   1670,
+   68.2
+  ],
+  [
+   1680,
+   68.3
+  ],
+  [
+   1700,
+   51.7
+  ],
+  [
+   1710,
+   56.5
+  ],
+  [
+   1720,
+   56.3
+  ],
+  [
+   1740,
+   40.9
+  ],
+  [
+   1750,
+   45.2
+  ],
+  [
+   1760,
+   45.4
+  ],
+  [
+   1780,
+   61.1
+  ],
+  [
+   1790,
+   60.9
+  ],
+  [
+   1820,
+   43.9
+  ],
+  [
+   1830,
+   45.2
+  ],
+  [
+   1840,
+   43.7
+  ],
+  [
+   1850,
+   65.5
+  ],
+  [
+   1860,
+   47.0
+  ],
+  [
+   1880,
+   47.0
+  ],
+  [
+   1890,
+   47.2
+  ],
+  [
+   1900,
+   47.4
+  ],
+  [
+   1910,
+   50.1
+  ],
+  [
+   1920,
+   50.7
+  ],
+  [
+   1930,
+   81.7
+  ],
+  [
+   1940,
+   53.3
+  ],
+  [
+   1950,
+   50.2
+  ],
+  [
+   1960,
+   50.3
+  ],
+  [
+   1970,
+   50.2
+  ],
+  [
+   1980,
+   66.2
+  ],
+  [
+   1990,
+   58.9
+  ],
+  [
+   2000,
+   59.0
+  ],
+  [
+   2010,
+   75.4
+  ],
+  [
+   2020,
+   75.4
+  ],
+  [
+   2080,
+   66.7
+  ],
+  [
+   2090,
+   64.8
+  ],
+  [
+   2110,
+   53.4
+  ],
+  [
+   2120,
+   51.2
+  ],
+  [
+   2140,
+   55.8
+  ],
+  [
+   2150,
+   56.1
+  ],
+  [
+   2160,
+   46.9
+  ],
+  [
+   2180,
+   62.0
+  ],
+  [
+   2190,
+   58.1
+  ],
+  [
+   2200,
+   47.4
+  ],
+  [
+   2210,
+   47.5
+  ],
+  [
+   2220,
+   47.6
+  ],
+  [
+   2230,
+   47.7
+  ],
+  [
+   2240,
+   47.9
+  ],
+  [
+   2250,
+   48.0
+  ],
+  [
+   2260,
+   48.1
+  ],
+  [
+   2300,
+   47.7
+  ],
+  [
+   2310,
+   47.8
+  ],
+  [
+   2320,
+   75.6
+  ],
+  [
+   2330,
+   48.0
+  ],
+  [
+   2360,
+   85.4
+  ],
+  [
+   2370,
+   85.4
+  ],
+  [
+   2380,
+   55.5
+  ],
+  [
+   2410,
+   53.9
+  ],
+  [
+   2420,
+   51.8
+  ],
+  [
+   2430,
+   51.8
+  ],
+  [
+   2440,
+   52.5
+  ],
+  [
+   2450,
+   48.0
+  ],
+  [
+   2460,
+   48.0
+  ],
+  [
+   2470,
+   73.8
+  ],
+  [
+   2480,
+   51.3
+  ],
+  [
+   2540,
+   69.2
+  ],
+  [
+   2580,
+   58.7
+  ],
+  [
+   2610,
+   73.7
+  ],
+  [
+   2620,
+   69.9
+  ],
+  [
+   2630,
+   83.7
+  ],
+  [
+   2640,
+   59.8
+  ],
+  [
+   2650,
+   64.3
+  ]
+ ]
+}

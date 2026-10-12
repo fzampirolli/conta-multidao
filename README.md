@@ -47,6 +47,7 @@ docs/                    site estático (publicado no GitHub Pages)
   modelos/               DM-Count (UCF-QNRF) quantizado em int8 (22 MB)
 python/
   baixar_flickr.py       coleta fotos com licença aberta e registra a proveniência
+  registrar.py           registro de imagens (mosaico) em linha de comando
   exportar_onnx.py       converte o DM-Count (PyTorch) para ONNX int8
 ```
 

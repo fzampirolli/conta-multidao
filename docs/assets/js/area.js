@@ -3,7 +3,16 @@ import { estado, avisar, ouvir, novoId, salvarLocal } from "./estado.js";
 import { areaGeodesica, comprimento, contornoCorredor, fmt } from "./matematica.js";
 import { CLASSES } from "./densidades.js";
 
-let mapa, camadaZonas, camadaRascunho, modo = "corredor", rascunho = [];
+let mapa, camadaZonas, camadaRascunho, modo = "corredor", rascunho = [], enquadrarAoMostrar = false;
+
+/** Chamado quando a etapa do mapa fica visível (Leaflet precisa saber o tamanho real). */
+export function mapaVisivel() {
+  mapa.invalidateSize();
+  if (enquadrarAoMostrar) {
+    mapa.fitBounds(L.latLngBounds(estado.zonas.flatMap((z) => z.pontos)), { padding: [20, 20] });
+    enquadrarAoMostrar = false;
+  }
+}
 const CORES = ["#0f6e7a", "#6d4bb3", "#b5651d", "#2f7d32", "#9c2a6a", "#33658a"];
 
 function areaZona(z) {
@@ -63,7 +72,7 @@ export function desenharLista() {
   if (!estado.zonas.length) { el.innerHTML = '<p class="suave">Nenhuma zona ainda.</p>'; return; }
   el.innerHTML = estado.zonas.map((z, i) => `
     <div class="cartao" style="padding:.7rem .8rem;margin-bottom:.6rem;border-left:5px solid ${CORES[i % CORES.length]}" data-z="${z.id}">
-      <div class="barra" style="margin:0"><input type="text" value="${z.nome}" data-campo="nome" style="width:10em">
+      <div class="barra" style="margin:0"><input type="text" value="${z.nome}" data-campo="nome" style="flex:1;min-width:8em">
         <button data-acao="ver" title="Ver no mapa">🔎</button><button data-acao="apagar" title="Apagar">🗑</button></div>
       <div>${z.tipo === "corredor"
         ? `Comprimento ${fmt(comprimento(z.pontos))} m × largura <input type="number" data-campo="largura" value="${z.largura}" min="1" step="1"> m`
@@ -141,7 +150,7 @@ export function iniciarArea() {
   document.getElementById("busca-local").onkeydown = (e) => e.key === "Enter" && buscar();
 
   ouvir("amostras", desenharLista);
-  ouvir("importado", () => { atualizar(); if (estado.zonas[0]) mapa.fitBounds(L.latLngBounds(estado.zonas.flatMap((z) => z.pontos))); });
+  ouvir("importado", () => { atualizar(); enquadrarAoMostrar = estado.zonas.length > 0; });
   desenharZonas(); desenharLista();
   return mapa;
 }
