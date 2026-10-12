@@ -3,13 +3,14 @@
 // ② polígono da amostra → área real (m²) via homografia
 // ③ cabeças marcadas à mão e/ou ④ soma do mapa de densidade da IA dentro do polígono
 import { estado, avisar, ouvir, novoId, salvarLocal, imagensDisponiveis, fonteImagem } from "./estado.js";
-import { homografia4, aplicarH, areaPoligono, dentro, fmt } from "./matematica.js";
+import { homografia4, homografiaMQ, sistemaLocal, aplicarH, areaPoligono, dentro, fmt } from "./matematica.js";
 import { contarIA, somarNoPoligono, mapaDeCalor } from "./ia.js";
 
 const cv = document.getElementById("den-canvas");
 const g = cv.getContext("2d");
 let ferr = "ref", imgId = null, esc = 1;
 let ref = [], poli = [], poliFechado = false, cabecas = [], ia = null, calor = null, iaAmostra = null;
+let grade = null; // grade de contagem: { centro (px da foto), cantos e células no chão, em metros }
 
 const $ = (id) => document.getElementById(id);
 const dica = (t) => ($("den-dica").textContent = t);
@@ -17,12 +18,72 @@ const dica = (t) => ($("den-dica").textContent = t);
 /** Metros por pixel, se a imagem já estiver em escala (ortomosaico). */
 const mppAtual = () => (imgId === "orto" ? estado.ortomosaico?.metrosPorPixel : null);
 
+/** Homografia foto → chão (metros) da foto atual, a partir dos pares de controle da etapa 3. */
+function Hgeoref() {
+  const f = estado.fotos.find((x) => x.id === imgId), g = f && estado.georef?.[f.hash];
+  if (!g || g.pares.length < 4) return null;
+  const S = sistemaLocal(g.pares[0].mapa);
+  try { return homografiaMQ(g.pares.map((p) => p.foto), g.pares.map((p) => S.paraMetros(p.mapa))).H; } catch { return null; }
+}
+/** Escala da imagem: ortomosaico > retângulo de referência marcado > pares de controle da etapa 3. */
 function H() {
   const mpp = mppAtual();
   if (mpp) return [mpp, 0, 0, 0, mpp, 0, 0, 0, 1]; // ortomosaico: escala uniforme, sem perspectiva
-  if (ref.length < 4) return null;
+  if (ref.length < 4) return Hgeoref();
   const w = +$("ref-larg").value, l = +$("ref-comp").value;
   try { return homografia4(ref, [[0, 0], [w, 0], [w, l], [0, l]]); } catch { return null; }
+}
+
+// ---------- Grade de contagem ----------
+// Um retângulo no chão (largura × profundidade, em metros) dividido em células (0,5, 1 ou 2 m), centrado no ponto clicado
+// e alinhado à direção da visada da câmera. A grade vira a amostra: cada célula mostra quantas cabeças tem.
+function montarGrade(centro) {
+  const h = H();
+  if (!h) return null;
+  const larg = +$("grade-larg").value, prof = +$("grade-prof").value, cel = +$("grade-cel").value;
+  const c = aplicarH(h, centro), q = aplicarH(h, [centro[0], centro[1] - 20]); // 20 px acima = mais longe da câmera
+  let d = [q[0] - c[0], q[1] - c[1]];
+  const n = Math.hypot(...d);
+  if (!isFinite(n) || n === 0) return null;
+  d = [d[0] / n, d[1] / n];
+  const e = [-d[1], d[0]];
+  const chao = (u, v) => [c[0] + e[0] * (u - larg / 2) + d[0] * (v - prof / 2), c[1] + e[1] * (u - larg / 2) + d[1] * (v - prof / 2)];
+  return { centro, larg, prof, cel, c, d, e, chao, inv: inverter(h) };
+}
+function aplicarGrade(centro) {
+  grade = montarGrade(centro);
+  if (!grade) { dica("Esta imagem ainda não tem escala: marque pares na etapa 3 ou o retângulo de referência (①)."); return; }
+  const { larg, prof, chao, inv } = grade;
+  poli = [chao(0, 0), chao(larg, 0), chao(larg, prof), chao(0, prof)].map((p) => aplicarH(inv, p));
+  poliFechado = true;
+}
+/** Célula (i, j) de um ponto da foto, ou null se fora da grade. */
+function celulaDe(p) {
+  const { c, d, e, larg, prof, cel } = grade, h = H(), q = aplicarH(h, p);
+  const u = (q[0] - c[0]) * e[0] + (q[1] - c[1]) * e[1] + larg / 2, v = (q[0] - c[0]) * d[0] + (q[1] - c[1]) * d[1] + prof / 2;
+  if (u < 0 || v < 0 || u >= larg || v >= prof) return null;
+  return [Math.floor(u / cel), Math.floor(v / cel)];
+}
+function desenharGrade() {
+  const { larg, prof, cel, chao, inv } = grade;
+  const P = (u, v) => { const p = aplicarH(inv, chao(u, v)); return [p[0] * esc, p[1] * esc]; };
+  g.strokeStyle = "rgba(255,255,255,.85)"; g.lineWidth = 1.2;
+  for (let u = 0; u <= larg + 1e-9; u += cel) { g.beginPath(); g.moveTo(...P(u, 0)); g.lineTo(...P(u, prof)); g.stroke(); }
+  for (let v = 0; v <= prof + 1e-9; v += cel) { g.beginPath(); g.moveTo(...P(0, v)); g.lineTo(...P(larg, v)); g.stroke(); }
+  // contagem por célula
+  const nu = Math.round(larg / cel), nv = Math.round(prof / cel), cont = Array.from({ length: nu }, () => new Array(nv).fill(0));
+  for (const p of cabecas) { const k = celulaDe(p); if (k) cont[k[0]][k[1]]++; }
+  // número no canto da célula (perto da câmera), só nas células com pessoas, para não cobrir as cabeças
+  g.textAlign = "center"; g.textBaseline = "middle";
+  for (let i = 0; i < nu; i++) for (let j = 0; j < nv; j++) {
+    if (!cont[i][j]) continue;
+    const [x2] = P((i + 1) * cel, (j + 0.5) * cel), [x1] = P(i * cel, (j + 0.5) * cel), lado = Math.abs(x2 - x1);
+    const [x, y] = P((i + 0.22) * cel, (j + 0.2) * cel);
+    g.font = `bold ${Math.min(18, Math.max(10, lado * 0.3))}px system-ui`;
+    g.lineWidth = 3; g.strokeStyle = "rgba(0,0,0,.75)"; g.fillStyle = "#ffd23f";
+    g.strokeText(cont[i][j], x, y); g.fillText(cont[i][j], x, y);
+  }
+  g.textAlign = "start"; g.textBaseline = "alphabetic";
 }
 function areaAmostra() {
   const h = H();
@@ -35,8 +96,10 @@ function desenhar() {
   $("den-area").classList.toggle("vazia", !f);
   if (!f) { cv.width = 10; cv.height = 10; return; }
   const W = f.naturalWidth || f.width, Ht = f.naturalHeight || f.height;
-  const larguraVisivel = $("den-area").clientWidth || 900;
-  esc = Math.min(1.5, larguraVisivel / W) * zoom;
+  // A foto inteira cabe no quadro (largura e altura): sem barra de rolagem no zoom 1, o tamanho não muda entre um
+  // clique e outro (antes, a barra aparecia, estreitava o quadro e deslocava os cliques seguintes).
+  const area = $("den-area");
+  esc = Math.min(1.5, (area.clientWidth || 900) / W, (area.clientHeight || 700) / Ht) * zoom;
   cv.width = Math.round(W * esc); cv.height = Math.round(Ht * esc);
   g.drawImage(f, 0, 0, cv.width, cv.height);
   if (calor && $("den-mapa-calor").checked) {
@@ -47,7 +110,8 @@ function desenhar() {
   const P = (p) => [p[0] * esc, p[1] * esc];
   // Grade do chão (mostra a perspectiva "desentortada"): linhas a cada 1 m dentro/ao redor do retângulo
   const h = H();
-  if (h && !mppAtual()) {
+  if (grade) desenharGrade();
+  else if (h && !mppAtual() && ref.length === 4) {
     const inv = inverter(h), w = +$("ref-larg").value, l = +$("ref-comp").value;
     g.strokeStyle = "rgba(255,255,255,.35)"; g.lineWidth = 1;
     const ext = 6;
@@ -114,14 +178,17 @@ cv.addEventListener("click", (e) => {
   if (!imgId) return;
   const p = pontoDoClique(e);
   const perto = (q, px = 10) => Math.hypot((q[0] - p[0]) * esc, (q[1] - p[1]) * esc) < px;
-  if (ferr === "ref") {
+  if (ferr === "grade") {
+    aplicarGrade(p);
+    if (grade) { selecionar("cabecas"); dica(`Grade de ${fmt(grade.larg * grade.prof)} m² posicionada. Clique em cada cabeça: cada célula mostra quantas pessoas tem. Para mover a grade, use ⑤ de novo.`); }
+  } else if (ferr === "ref") {
     if (ref.length >= 4) ref = [];
     ref.push(p);
     dica(ref.length < 4 ? `Canto ${ref.length + 1} de 4 (sentido horário, começando pelo canto da "largura").`
       : "Referência pronta! A grade branca mostra metros no chão. Agora desenhe o trecho da amostra (②).");
     if (ref.length === 4) selecionar("amostra");
   } else if (ferr === "amostra") {
-    if (poliFechado) { poli = []; poliFechado = false; }
+    if (poliFechado) { poli = []; poliFechado = false; grade = null; }
     if (poli.length >= 3 && perto(poli[0], 14)) { poliFechado = true; dica("Amostra fechada. Conte as cabeças (③) e/ou use a IA (④)."); }
     else { poli.push(p); dica("Clique no primeiro ponto para fechar o polígono."); }
   } else if (ferr === "cabecas") {
@@ -138,6 +205,8 @@ function selecionar(f) {
     ref: "Marque os 4 cantos de um retângulo de tamanho conhecido no chão, em ordem (sentido horário).",
     amostra: "Clique para marcar os vértices do trecho da amostra; clique no 1º ponto para fechar.",
     cabecas: "Clique em cada cabeça dentro da amostra. Clique de novo numa marca para apagá-la. Use o zoom (+) para enxergar melhor.",
+    grade: H() ? "Clique no ponto da foto onde quer a grade de contagem (por exemplo, junto ao palanque). Ajuste a célula e o tamanho ao lado."
+      : "Esta imagem ainda não tem escala: marque pares na etapa 3 (Projeção) ou o retângulo de referência (①).",
   }[f]);
 }
 
@@ -215,13 +284,16 @@ function salvar() {
   const n = nDentro > 0 ? nDentro : iaAmostra;
   estado.amostras.push({
     id: novoId("a"), imagemId: imgId, imagem: f ? f.nome : imgId === "orto" ? estado.ortomosaico.nome : estado.mosaicos.find((m) => m.id === imgId)?.nome, hashImagem: f?.hash || null,
-    referencia: mppAtual() ? { ortomosaico: true, metrosPorPixel: mppAtual() } : { pontos: ref.map((p) => p.map((v) => +v.toFixed(1))), largura: +$("ref-larg").value, comprimento: +$("ref-comp").value },
+    referencia: mppAtual() ? { ortomosaico: true, metrosPorPixel: mppAtual() }
+      : ref.length < 4 ? { paresDeControle: true, pares: estado.georef[f.hash].pares.length }
+      : { pontos: ref.map((p) => p.map((v) => +v.toFixed(1))), largura: +$("ref-larg").value, comprimento: +$("ref-comp").value },
     poligono: poli.map((p) => p.map((v) => +v.toFixed(1))), areaM2: +a.toFixed(2),
     cabecas: nDentro, posicoesCabecas: cabecas.filter((p) => dentro(p[0], p[1], poli)).map((p) => p.map((v) => +v.toFixed(1))),
     contagemIA: iaAmostra != null ? +iaAmostra.toFixed(1) : null, metodo, densidade: +(n / a).toFixed(3),
+    ...(grade && { grade: { larguraM: grade.larg, profundidadeM: grade.prof, celulaM: grade.cel, centro: grade.centro.map((v) => +v.toFixed(1)) } }),
   });
   salvarLocal(); listar(); avisar("amostras");
-  dica("Amostra salva! Associe-a a uma zona na etapa 3, ou faça outra amostra em outro trecho.");
+  dica("Amostra salva! Associe-a a uma zona na etapa 4 (Área no mapa), ou faça outra amostra em outro trecho.");
 }
 
 function listar() {
@@ -238,9 +310,10 @@ function listar() {
 
 function trocarImagem() {
   imgId = $("den-imagem").value || null;
-  ref = []; poli = []; poliFechado = false; cabecas = []; ia = null; calor = null;
+  ref = []; poli = []; poliFechado = false; cabecas = []; ia = null; calor = null; grade = null;
   $("ia-foto-inteira").innerHTML = "";
-  if (mppAtual()) { selecionar("amostra"); dica(`O ortomosaico já está em escala (${mppAtual().toFixed(2)} m por pixel): desenhe direto o trecho da amostra.`); }
+  if (!mppAtual() && Hgeoref()) { selecionar("grade"); dica("Esta foto já tem escala pelos pares da etapa 3. Clique onde quer a grade de contagem (por exemplo, junto ao palanque), ou marque um retângulo de referência (①)."); }
+  else if (mppAtual()) { selecionar("amostra"); dica(`O ortomosaico já está em escala (${mppAtual().toFixed(2)} m por pixel): desenhe direto o trecho da amostra.`); }
   else selecionar("ref");
   desenhar();
 }
@@ -256,7 +329,9 @@ export function iniciarDensidade() {
   sel.onchange = trocarImagem;
   document.querySelectorAll("[data-ferr]").forEach((b) => (b.onclick = () => selecionar(b.dataset.ferr)));
   $("den-ia").onclick = rodarIA;
-  $("den-limpar").onclick = () => { ref = []; poli = []; poliFechado = false; cabecas = []; selecionar("ref"); desenhar(); };
+  $("den-limpar").onclick = () => { ref = []; poli = []; poliFechado = false; cabecas = []; grade = null; selecionar(Hgeoref() ? "grade" : "ref"); desenhar(); };
+  // muda o tamanho da grade sem perder a posição
+  ["grade-cel", "grade-larg", "grade-prof"].forEach((id) => ($(id).onchange = () => { if (grade) aplicarGrade(grade.centro); desenhar(); }));
   $("den-mapa-calor").onchange = desenhar;
   $("den-salvar").onclick = salvar;
   $("ref-larg").onchange = $("ref-comp").onchange = desenhar;
