@@ -24,8 +24,8 @@ Histórico completo da conversa que criou o projeto: `notas/conversa-2026-10-12.
 - Câmeras calibradas por pontos de fuga (`python/projecao/`, parâmetros em `dados/paulista-2026-10-11/`):
   vista 1 a ≈63 m de altura, ≈100 m antes do MASP; vista 2 a ≈18 m, na ponta SE do MASP.
 - Resultado publicado (revisão de 12/10/2026): de 210 mil a 380 mil pessoas (mediana ≈290 mil). Núcleo apoiado em contagem manual com a grade
-  junto ao palanque (4,96 e 1,84/m² no mesmo trecho, em duas fotos); demais zonas por classe visual decrescente; observações de campo do autor
-  (≈2/m² na estação Paulista do metrô; multidões nas transversais, não incluídas). Versão anterior: 140–280 mil.
+  junto ao palanque (4,96 e 1,84/m² no mesmo trecho, em duas fotos); demais zonas por classe visual decrescente; relatos não verificados
+  (≈2/m² na estação Paulista do metrô; multidões nas transversais, não incluídas). Nunca dizer que o autor esteve no ato. Versão anterior: 140–280 mil.
 
 ## Convenções
 - Textos em português, tom didático e neutro; o mesmo método vale para qualquer lado político.

@@ -9,8 +9,8 @@
   "Comprimentos medidos sobre o eixo da avenida no OpenStreetMap (cruzamentos: Consolação 165 m, Augusta 559 m, J. E. de Lima 1.863 m, Brigadeiro 2.110 m, fim do eixo ≈2.718 m a partir da Av. Angélica/Minas Gerais).",
   "Densidades (revisão de 12/10/2026): no núcleo, contagem manual com grade de 1 m projetada no chão, junto ao carro de som e no mesmo local em duas fotos: 55583675910 (124 cabeças em 25 m² = 4,96/m²) e 55583639030 (46 em 25 m² = 1,84/m²). A diferença entre as duas mostra a incerteza da contagem. As cabeças estão ≈1,6 m acima do chão; com a câmera a ≈18 m, isso pode subestimar a densidade em até ≈20%. O núcleo (500 m) usa 3 · 4 · 5/m², abaixo do ponto mais denso junto ao palanque; as demais zonas recebem valores decrescentes por julgamento visual, sem medição (as fotos têm menos de 3 px/m nesses trechos).",
   "Tentativas de amostra com IA resultaram em >9 pessoas/m² (implausível), indicando supercontagem nessas fotos; a IA não foi usada para as densidades.",
-  "Observação de campo do autor (presente no ato): ≈2 pessoas/m² em frente à estação Paulista do metrô (zona Consolação → Augusta). Sem registro de horário nem foto; usada como apoio, não como medição.",
-  "Observação de campo do autor: as ruas transversais à Paulista também tinham multidões. Elas não estão nas zonas, portanto esta estimativa não as inclui e, nesse sentido, é conservadora.",
+  "Relato não verificado: ≈2 pessoas/m² em frente à estação Paulista do metrô (zona Consolação → Augusta). Sem registro de horário nem foto; usado como apoio, não como medição.",
+  "Relatos indicam multidões também nas ruas transversais à Paulista. Elas não estão nas zonas, portanto esta estimativa não as inclui e, nesse sentido, é conservadora.",
   "Versão anterior desta estimativa (12/10/2026, densidades só por julgamento visual): 140 mil a 280 mil pessoas, mediana ≈200 mil.",
   "Fotos: única fonte com licença aberta é o álbum oficial da campanha (possível viés de seleção de ângulo e horário).",
   "Horários: o campo 'data' das fotos é a hora de edição/exportação no Lightroom (vários arquivos com 14:03:12), não a hora de captura."
