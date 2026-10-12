@@ -14,12 +14,13 @@ Qualquer pessoa, sem instalar nada, pode:
 
 1. **Enviar fotos** de um evento. Elas são processadas só no navegador e nunca enviadas a servidores. Cada foto recebe sua impressão digital SHA-256.
 2. **Registrar as fotos** num mosaico (ORB → correspondências → RANSAC → homografia), para não contar a mesma pessoa duas vezes.
-3. **Desenhar a área ocupada** num mapa do OpenStreetMap, dividida em zonas (trecho de rua com largura, ou polígono).
-4. **Medir a densidade** (pessoas/m²) em amostras das fotos:
+3. **Projetar as fotos no mapa** (ortorretificação): pontos de controle foto ↔ ortofoto, homografia por mínimos quadrados com erro em metros, e um **ortomosaico** de toda a extensão. Em São Paulo, a base é a ortofoto 2020 do GeoSampa.
+4. **Desenhar a área ocupada** num mapa do OpenStreetMap, dividida em zonas (trecho de rua com largura, ou polígono).
+5. **Medir a densidade** (pessoas/m²) em amostras das fotos:
    - um retângulo de tamanho conhecido no chão define uma homografia que converte pixels em m²;
    - as pessoas são contadas à mão (clique) e/ou pela IA **DM-Count**, que roda no navegador via ONNX;
    - um teste de escala mostra se a IA é confiável naquele trecho.
-5. **Ver o resultado com incerteza**: Total = Σ área × densidade, com intervalo de 90% por Monte Carlo (semente fixa), checagem de capacidade física e relatório JSON completo e reprodutível.
+6. **Ver o resultado com incerteza**: Total = Σ área × densidade, com intervalo de 90% por Monte Carlo (semente fixa), checagem de capacidade física e relatório JSON completo e reprodutível.
 
 ## Princípios
 
@@ -41,6 +42,8 @@ docs/                    site estático (publicado no GitHub Pages)
     matematica.js        homografia (DLT), áreas geodésicas, Monte Carlo
     registro.js          registro de imagens com OpenCV.js
     ia.js                DM-Count via onnxruntime-web, em blocos de 512 px
+    projecao.js          projeção no mapa: pontos de controle, homografia, ortomosaico
+    camadas.js           mapas base (OpenStreetMap, ortofoto GeoSampa)
     area.js              mapa (Leaflet + OpenStreetMap)
     densidade.js         amostras: referência, polígono, contagem manual/IA
     resultado.js         estimativa, incerteza e relatório
@@ -48,6 +51,7 @@ docs/                    site estático (publicado no GitHub Pages)
 python/
   baixar_flickr.py       coleta fotos com licença aberta e registra a proveniência
   registrar.py           registro de imagens (mosaico) em linha de comando
+  projecao/              calibração de câmera por pontos de fuga (estudo de caso)
   exportar_onnx.py       converte o DM-Count (PyTorch) para ONNX int8
 ```
 
@@ -78,4 +82,5 @@ export FLICKR_API_KEY=...                          # chave gratuita do Flickr
 - Código: licença MIT.
 - Fotos do estudo de caso: Ricardo Stuckert / Lula Oficial (Flickr), **CC BY-SA 4.0**. Foi a única fonte com licença aberta encontrada para o evento (veja `docs/casos/paulista-2026-10-11/fotos.json`).
 - Modelo: DM-Count (Wang et al., NeurIPS 2020), pesos UCF-QNRF distribuídos pelo pacote [lwcc](https://github.com/tersekmatija/lwcc) (MIT).
+- Ortofoto 2020: Prefeitura de São Paulo / GeoSampa, CC BY-SA 4.0. Imagens do Google Maps não são usadas (os termos proíbem derivar dados).
 - Bibliotecas: OpenCV.js, onnxruntime-web, Leaflet. Mapas © colaboradores do OpenStreetMap.

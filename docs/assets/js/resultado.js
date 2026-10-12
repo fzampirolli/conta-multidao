@@ -110,6 +110,8 @@ export function relatorio() {
       mosaico: m.nome, largura: m.largura, altura: m.altura,
       transformacoes: m.transformacoes.map((t) => ({ foto: estado.fotos.find((f) => f.id === t.id)?.nome, H: t.H, inliers: t.inliers })),
     })),
+    georef: estado.georef,
+    ortomosaico: estado.ortomosaico && { bounds: estado.ortomosaico.bounds, metrosPorPixel: estado.ortomosaico.metrosPorPixel, fotos: estado.ortomosaico.fotos, pxPorMetroMin: estado.ortomosaico.pxPorMetroMin },
     zonas: estado.zonas,
     amostras: estado.amostras,
   };
@@ -125,7 +127,7 @@ export function iniciarResultado() {
   document.getElementById("res-imprimir").onclick = () => window.print();
   document.getElementById("res-importar").onchange = async (e) => {
     const d = JSON.parse(await e.target.files[0].text());
-    estado.zonas = d.zonas || []; estado.amostras = d.amostras || [];
+    estado.zonas = d.zonas || []; estado.amostras = d.amostras || []; estado.georef = d.georef || estado.georef;
     salvarLocal(); avisar("importado"); desenharResultado();
   };
 }

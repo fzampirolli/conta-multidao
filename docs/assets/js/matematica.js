@@ -175,3 +175,66 @@ export function arred(x, sig = 2) {
 
 export const fmt = (x, dec = 0) =>
   Number(x).toLocaleString("pt-BR", { maximumFractionDigits: dec, minimumFractionDigits: dec });
+
+// ---------- Homografia por mínimos quadrados (N ≥ 4 pares), com normalização de Hartley ----------
+
+/** Normaliza pontos: centro na origem, distância média √2. Retorna {pts, T} (T 3x3). */
+function normalizar(pts) {
+  const n = pts.length;
+  const cx = pts.reduce((s, p) => s + p[0], 0) / n, cy = pts.reduce((s, p) => s + p[1], 0) / n;
+  const d = pts.reduce((s, p) => s + Math.hypot(p[0] - cx, p[1] - cy), 0) / n || 1;
+  const k = Math.SQRT2 / d;
+  return { pts: pts.map(([x, y]) => [(x - cx) * k, (y - cy) * k]), T: [k, 0, -k * cx, 0, k, -k * cy, 0, 0, 1] };
+}
+
+export function mult3(A, B) {
+  const C = new Array(9).fill(0);
+  for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) for (let k = 0; k < 3; k++) C[3 * i + j] += A[3 * i + k] * B[3 * k + j];
+  return C;
+}
+
+export function inverter3(m) {
+  const [a, b, c, d, e, f, g, h, i] = m;
+  const A = e * i - f * h, B = -(d * i - f * g), C = d * h - e * g;
+  const det = a * A + b * B + c * C;
+  return [A, -(b * i - c * h), b * f - c * e, B, a * i - c * g, -(a * f - c * d), C, -(a * h - b * g), a * e - b * d].map((v) => v / det);
+}
+
+/**
+ * Homografia origem→destino com N ≥ 4 pares, por mínimos quadrados (equações normais do DLT com h33 = 1).
+ * Retorna {H, residuos (distância no destino), rms}.
+ */
+export function homografiaMQ(origem, destino) {
+  const n = origem.length;
+  if (n < 4) throw new Error("São necessários pelo menos 4 pares de pontos");
+  const O = normalizar(origem), D = normalizar(destino);
+  const AtA = Array.from({ length: 8 }, () => new Array(8).fill(0)), Atb = new Array(8).fill(0);
+  const add = (lin, b) => {
+    for (let i = 0; i < 8; i++) { Atb[i] += lin[i] * b; for (let j = 0; j < 8; j++) AtA[i][j] += lin[i] * lin[j]; }
+  };
+  for (let i = 0; i < n; i++) {
+    const [x, y] = O.pts[i], [u, v] = D.pts[i];
+    add([x, y, 1, 0, 0, 0, -u * x, -u * y], u);
+    add([0, 0, 0, x, y, 1, -v * x, -v * y], v);
+  }
+  const h = resolver(AtA, Atb);
+  const Hn = [...h, 1];
+  const H = mult3(inverter3(D.T), mult3(Hn, O.T));
+  const H9 = H.map((v) => v / H[8]);
+  const residuos = origem.map((p, i) => {
+    const q = aplicarH(H9, p);
+    return Math.hypot(q[0] - destino[i][0], q[1] - destino[i][1]);
+  });
+  const rms = Math.sqrt(residuos.reduce((s, r) => s + r * r, 0) / n);
+  return { H: H9, residuos, rms };
+}
+
+// ---------- Sistema métrico local (metros a leste/norte de uma origem) ----------
+export function sistemaLocal([lat0, lon0]) {
+  const mx = 111320 * Math.cos((lat0 * Math.PI) / 180), my = 110540;
+  return {
+    origem: [lat0, lon0],
+    paraMetros: ([la, lo]) => [(lo - lon0) * mx, (la - lat0) * my],
+    paraLatLon: ([x, y]) => [lat0 + y / my, lon0 + x / mx],
+  };
+}

@@ -69,6 +69,7 @@
     <nav class="etapas" aria-label="Etapas">
       <button data-etapa="fotos" class="ativo">Fotos</button>
       <button data-etapa="registro">Registro (mosaico)</button>
+      <button data-etapa="projecao">Projeção no mapa</button>
       <button data-etapa="area">Área no mapa</button>
       <button data-etapa="densidade">Densidade nas fotos</button>
       <button data-etapa="resultado">Resultado</button>
@@ -126,11 +127,56 @@
       </div>
     </div>
 
-    <!-- 3. ÁREA -->
+    <!-- 3. PROJEÇÃO -->
+    <div class="painel" id="painel-projecao">
+      <div class="cartao">
+        <h2>3. Projeção no mapa: ver a multidão de cima, em escala</h2>
+        <p>Fotos tiradas de lado (oblíquas) deformam o chão: o que está perto parece grande e o que está longe, pequeno.
+          Aqui cada foto é <b>projetada sobre o mapa</b>, como se fosse vista de cima. Juntas, elas formam um <b>ortomosaico</b>
+          que mostra quais trechos da rua cada foto cobre, sempre em metros.</p>
+        <details class="explica">
+          <summary>Como funciona (pontos de controle e homografia)</summary>
+          <ol>
+            <li>Escolha uma foto e clique num ponto <b>do chão</b> que também apareça no mapa: canto de faixa de pedestres,
+              ponta de canteiro, quina de calçada, base de poste. Depois clique no mesmo ponto no mapa (use a camada de ortofoto).</li>
+            <li>Com <b>4 ou mais pares</b>, o site calcula por mínimos quadrados a homografia que leva a foto ao chão.
+              Com mais pares (6 a 10, espalhados pela foto), o resultado fica melhor e o erro de cada ponto, em metros, aparece na tabela.</li>
+            <li>Ao gerar o ortomosaico, cada pixel do chão recebe a foto que o mostra com <b>mais detalhe</b>. Regiões distantes
+              demais (poucos pixels por metro) são descartadas, para não "esticar" o que a foto não mostra bem.</li>
+          </ol>
+          <b>Limitação:</b> o modelo supõe chão plano. Prédios, árvores e pessoas em pé aparecem "deitados"; só o nível da rua é fiel.
+          Nunca use topos de prédios como ponto de controle.
+        </details>
+        <div class="barra">
+          <label>Foto: <select id="proj-foto" style="width:auto;max-width:28em"></select></label>
+          <span id="proj-zoom" class="grupo-botoes" style="margin:0"></span>
+          <button id="proj-desfazer">Desfazer último ponto</button>
+        </div>
+        <p class="pequeno" id="proj-dica">Envie fotos na etapa 1.</p>
+        <div class="grade-projecao">
+          <div class="area-trabalho" id="proj-area"><canvas id="proj-canvas" width="10" height="10"></canvas></div>
+          <div id="proj-mapa"></div>
+        </div>
+        <div id="proj-pares" class="rolagem"></div>
+        <h3>Ortomosaico</h3>
+        <div class="barra">
+          <label>Resolução: <select id="proj-res" style="width:auto"><option value="0.2">0,2 m/px</option><option value="0.3" selected>0,3 m/px</option><option value="0.5">0,5 m/px</option><option value="1">1 m/px</option></select></label>
+          <label>Descartar onde a foto tem menos de <select id="proj-min" style="width:auto"><option value="0.3">0,3 (toda a extensão visível)</option><option value="0.7">0,7</option><option value="1.5">1,5</option><option value="3" selected>3</option><option value="6">6</option></select> pixels por metro</label>
+          <label><input type="checkbox" id="proj-recorte"> recortar às zonas desenhadas (etapa 4)</label>
+          <button class="primario" id="proj-gerar">Gerar ortomosaico</button>
+          <button id="proj-baixar" disabled>Baixar PNG</button>
+          <label>Opacidade <input type="range" id="proj-opac" min="0" max="1" step="0.05" value="0.9"></label>
+        </div>
+        <div class="progresso"><div id="proj-prog"></div></div>
+        <p class="pequeno" id="proj-status"></p>
+      </div>
+    </div>
+
+    <!-- 4. ÁREA -->
     <div class="painel" id="painel-area">
       <div class="duas-colunas">
         <div class="cartao">
-          <h2>3. Desenhe no mapa a área ocupada</h2>
+          <h2>4. Desenhe no mapa a área ocupada</h2>
           <div class="barra">
             <input type="text" id="busca-local" placeholder="Buscar local (ex.: Avenida Paulista)">
             <button id="buscar">Buscar</button>
@@ -158,10 +204,10 @@
       </div>
     </div>
 
-    <!-- 4. DENSIDADE -->
+    <!-- 5. DENSIDADE -->
     <div class="painel" id="painel-densidade">
       <div class="cartao">
-        <h2>4. Meça a densidade (pessoas por m²) nas fotos</h2>
+        <h2>5. Meça a densidade (pessoas por m²) nas fotos</h2>
         <p>Escolha um trecho representativo da multidão numa foto, informe uma <b>medida real</b> visível
           (por exemplo, a largura de um carro de som, de uma faixa de pedestres ou de um ônibus)
           e conte as pessoas dentro dele, à mão ou com a IA.</p>
@@ -212,11 +258,11 @@
       </div>
     </div>
 
-    <!-- 5. RESULTADO -->
+    <!-- 6. RESULTADO -->
     <div class="painel" id="painel-resultado">
       <div class="cartao">
-        <h2>5. Resultado</h2>
-        <div id="res-conteudo"><p class="suave">Desenhe ao menos uma zona no mapa (etapa 3) para ver a estimativa.</p></div>
+        <h2>6. Resultado</h2>
+        <div id="res-conteudo"><p class="suave">Desenhe ao menos uma zona no mapa (etapa 4) para ver a estimativa.</p></div>
         <div class="grupo-botoes">
           <button class="primario" id="res-json">Baixar relatório (JSON)</button>
           <button id="res-imprimir">Imprimir / salvar PDF</button>
@@ -229,7 +275,7 @@
 
 <footer>
   <div class="conteudo">
-    Conta Multidão: software livre (licença MIT). Mapas © colaboradores do <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>.
+    Conta Multidão: software livre (licença MIT). Mapas © colaboradores do <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>; ortofoto 2020 © Prefeitura de São Paulo/GeoSampa (CC BY-SA 4.0).
     IA: modelo DM-Count (Wang et al., NeurIPS 2020) treinado no conjunto UCF-QNRF.
     As estimativas dependem das fotos e das escolhas de quem usa a ferramenta, e todas ficam registradas no relatório.
   </div>

@@ -2,6 +2,7 @@
 import { estado, avisar, ouvir, novoId, salvarLocal } from "./estado.js";
 import { areaGeodesica, comprimento, contornoCorredor, fmt } from "./matematica.js";
 import { CLASSES } from "./densidades.js";
+import { criarCamadasBase } from "./camadas.js";
 
 let mapa, camadaZonas, camadaRascunho, modo = "corredor", rascunho = [], enquadrarAoMostrar = false;
 
@@ -9,7 +10,8 @@ let mapa, camadaZonas, camadaRascunho, modo = "corredor", rascunho = [], enquadr
 export function mapaVisivel() {
   mapa.invalidateSize();
   if (enquadrarAoMostrar) {
-    mapa.fitBounds(L.latLngBounds(estado.zonas.flatMap((z) => z.pontos)), { padding: [20, 20] });
+    const pts = estado.zonas.flatMap((z) => z.pontos);
+    mapa.fitBounds(pts.length ? L.latLngBounds(pts) : L.latLngBounds(estado._enquadrarOrto), { padding: [20, 20] });
     enquadrarAoMostrar = false;
   }
 }
@@ -122,9 +124,7 @@ function alertaMapa(t) {
 
 export function iniciarArea() {
   mapa = L.map("mapa", { doubleClickZoom: false }).setView(estado.mapaCentro || [-23.5614, -46.6559], estado.mapaCentro ? 16 : 15);
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    maxZoom: 19, attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-  }).addTo(mapa);
+  criarCamadasBase(mapa);
   L.control.scale({ imperial: false }).addTo(mapa);
   camadaZonas = L.layerGroup().addTo(mapa);
   camadaRascunho = L.layerGroup().addTo(mapa);
@@ -150,6 +150,15 @@ export function iniciarArea() {
   document.getElementById("busca-local").onkeydown = (e) => e.key === "Enter" && buscar();
 
   ouvir("amostras", desenharLista);
+  // Ortomosaico (etapa de projeção) aparece sob as zonas: ajuda a desenhar só onde há gente.
+  let sobreposicao = null;
+  ouvir("ortomosaico", () => {
+    if (sobreposicao) mapa.removeLayer(sobreposicao);
+    const m = estado.ortomosaico;
+    sobreposicao = L.imageOverlay(m.canvas.toDataURL("image/png"), m.bounds, { opacity: 0.9 }).addTo(mapa);
+    camadaZonas.bringToFront?.();
+    enquadrarAoMostrar = true; estado._enquadrarOrto = m.bounds;
+  });
   ouvir("importado", () => { atualizar(); enquadrarAoMostrar = estado.zonas.length > 0; });
   desenharZonas(); desenharLista();
   return mapa;

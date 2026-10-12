@@ -23,7 +23,7 @@
 
 <main class="artigo">
   <h1>Como estimar o tamanho de uma multidão</h1>
-  <p class="lead suave">Um guia em 6 passos, sem fórmulas complicadas, do método que esta ferramenta usa.
+  <p class="lead suave">Um guia em 7 passos, sem fórmulas complicadas, do método que esta ferramenta usa.
     Ele vale para qualquer evento, de qualquer causa, em qualquer lugar.</p>
 
   <div class="explica">
@@ -59,7 +59,22 @@
   <p>Fotos tiradas de pontos de vista muito diferentes não se alinham. A ferramenta, então, forma um mosaico por grupo
     de fotos compatíveis e mostra tudo na tela: correspondências, inliers e a matriz de cada par.</p>
 
-  <h2><span class="passo-num">3</span>Medir a área no mapa</h2>
+  <h2><span class="passo-num">3</span>Projeção no mapa: ver a multidão de cima</h2>
+  <p>Fotos tiradas de lado deformam o chão. Para medir em metros e ver quais trechos cada foto cobre, projetamos cada foto
+    sobre um mapa ou ortofoto (imagem aérea corrigida, como a do GeoSampa em São Paulo). Isso se chama <b>ortorretificação</b>.
+    A versão simplificada usada aqui supõe o chão plano:</p>
+  <ul>
+    <li><b>Pontos de controle</b>: o mesmo ponto do chão marcado na foto e no mapa (cantos de faixas, quinas de calçada, bases de postes).
+      Com 4 ou mais pares, uma homografia por mínimos quadrados leva a foto ao chão, e o erro de cada ponto aparece em metros.</li>
+    <li><b>Quando o chão está coberto pela multidão</b>, a câmera pode ser calibrada por <b>pontos de fuga</b>: arestas verticais
+      dos prédios e linhas paralelas à rua dão a focal e a orientação; uma medida conhecida dá a escala.</li>
+    <li>O <b>ortomosaico</b> junta as fotos projetadas. Em cada pixel fica a foto com mais detalhe ali, e regiões com poucos pixels
+      por metro são descartadas ou sinalizadas.</li>
+  </ul>
+  <p>Prédios, árvores e pessoas em pé aparecem "deitados" na projeção: só o nível da rua é fiel. Use imagens de base com licença
+    aberta (OpenStreetMap, ortofotos municipais, INPE). Os termos do Google Maps não permitem derivar dados das imagens.</p>
+
+  <h2><span class="passo-num">4</span>Medir a área no mapa</h2>
   <p>A área é medida num mapa (OpenStreetMap), não na foto, porque a foto tem perspectiva. Há duas formas de desenhar:</p>
   <ul>
     <li><b>Trecho de rua</b>: você traça a linha central da rua ocupada e informa a largura. Área = comprimento × largura.</li>
@@ -69,7 +84,7 @@
     é mais rala. Exclua palcos, canteiros, carros de som e trechos vazios. Uma margem de erro (padrão ±10%) acompanha
     cada área.</p>
 
-  <h2><span class="passo-num">4</span>Medir a densidade nas fotos</h2>
+  <h2><span class="passo-num">5</span>Medir a densidade nas fotos</h2>
   <p>Aqui está o coração do método. A densidade é <b>medida em amostras</b>, isto é, trechos da foto onde dá para contar as pessoas.
     O problema é a perspectiva: quem está longe parece menor. A solução é outra homografia:</p>
   <svg viewBox="0 0 640 210" role="img" aria-label="Homografia: retângulo em perspectiva vira retângulo visto de cima" style="width:100%;color:var(--acento)">
@@ -99,14 +114,14 @@
     Por isso: (1) use a IA em amostras próximas, não na foto inteira; (2) faça o <b>teste de escala</b>, processando a mesma foto
     em 3 resoluções (números estáveis indicam confiança); (3) compare com uma contagem manual na mesma amostra.</div>
 
-  <h2><span class="passo-num">5</span>Incerteza: dizer quanto o número pode variar</h2>
+  <h2><span class="passo-num">6</span>Incerteza: dizer quanto o número pode variar</h2>
   <p>Toda medida tem erro. Em vez de um número "exato" (e falso), a ferramenta faz uma <b>simulação de Monte Carlo</b>:
     repete a conta 20.000 vezes, sorteando em cada vez uma área dentro da margem de erro e uma densidade entre o mínimo e o
     máximo informados. O resultado é um <b>intervalo</b> que contém 90% das simulações, por exemplo
     "entre 60 mil e 95 mil pessoas, mais provável 78 mil". O gerador de números aleatórios usa semente fixa, então qualquer
     pessoa que importe o mesmo relatório obtém os mesmos números.</p>
 
-  <h2><span class="passo-num">6</span>Checagem física e transparência</h2>
+  <h2><span class="passo-num">7</span>Checagem física e transparência</h2>
   <ul>
     <li><b>Capacidade máxima</b>: área × 4 pessoas/m² dá um teto realista para quem está presente <i>ao mesmo tempo</i>.
       Números anunciados acima disso exigem área maior ou se referem ao total de pessoas que passaram ao longo do dia
@@ -138,6 +153,7 @@
     <li>Watson, R., &amp; Yip, P. (2011). How many were there when it mattered? <i>Significance</i>, 8(3), 104–107.</li>
     <li>Rublee, E. et al. (2011). ORB: An efficient alternative to SIFT or SURF. <i>ICCV</i>.</li>
     <li>Fischler, M. A., &amp; Bolles, R. C. (1981). Random sample consensus (RANSAC). <i>Communications of the ACM</i>, 24(6), 381–395.</li>
+    <li>Caprile, B., &amp; Torre, V. (1990). Using vanishing points for camera calibration. <i>International Journal of Computer Vision</i>, 4(2), 127–139.</li>
     <li>Hartley, R., &amp; Zisserman, A. (2004). <i>Multiple View Geometry in Computer Vision</i>. Cambridge University Press.</li>
     <li>Wang, B., Liu, H., Samaras, D., &amp; Hoai, M. (2020). Distribution Matching for Crowd Counting (DM-Count). <i>NeurIPS</i>.</li>
     <li>Idrees, H. et al. (2018). Composition Loss for Counting, Density Map Estimation and Localization in Dense Crowds (UCF-QNRF). <i>ECCV</i>.</li>

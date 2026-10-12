@@ -66,7 +66,47 @@
   <figure><img src="paulista-2026-10-11/mosaico-2.jpg" alt="Mosaico de 3 fotos aéreas olhando para a Consolação" loading="lazy">
     <figcaption>Mosaico 2: 3 fotos registradas (inliers por par: 815 e 1.371). Carro de som em frente ao MASP. Fotos: Ricardo Stuckert/Lula Oficial, CC BY-SA 4.0.</figcaption></figure>
 
-  <h2><span class="passo-num">3</span>Área: medida no OpenStreetMap</h2>
+
+  <h2><span class="passo-num">3</span>Projeção no mapa: a avenida inteira vista de cima</h2>
+  <p>Para ver <b>toda a extensão</b> da Paulista numa só imagem, em escala, projetamos as fotos oblíquas sobre a
+    <b>ortofoto 2020 da Prefeitura de São Paulo</b> (GeoSampa, ≈10–20 cm por pixel, licença CC BY-SA 4.0). Não usamos imagens do
+    Google Maps, cujos termos proíbem derivar dados das imagens. Os satélites do INPE (CBERS-4A, 2 m por pixel) são gratuitos,
+    mas grosseiros demais para marcar faixas e meios-fios. Servem de alternativa para cidades sem ortofoto municipal.</p>
+  <p>Na ferramenta, a projeção é feita marcando <b>pontos de controle</b> (o mesmo ponto do chão na foto e no mapa). Aqui, porém,
+    a multidão cobre quase todo o chão. Por isso usamos uma técnica clássica de fotogrametria, a <b>calibração por pontos de fuga</b>:</p>
+  <ol>
+    <li>As arestas verticais dos prédios convergem num <b>ponto de fuga vertical</b> (detecção automática de segmentos + RANSAC).</li>
+    <li>As bordas da multidão (vista 1) e as arestas longas da fachada do MASP (vista 2), paralelas à avenida, convergem no
+      <b>ponto de fuga da avenida</b>.</li>
+    <li>Os dois pontos de fuga dão a <b>distância focal</b> e a <b>orientação</b> da câmera. A largura do carro de som (3,0 m) dá a
+      <b>escala</b> (altura da câmera), e um ponto conhecido do chão dá a <b>posição</b>: a base do pilar noroeste do MASP na vista 1,
+      e a traseira do caminhão, localizada pela vista 1 somando os 19,7 m de comprimento, na vista 2.</li>
+  </ol>
+  <table>
+    <tr><th>Vista</th><th class="num">Focal</th><th class="num">Altura da câmera</th><th>Posição</th><th class="num">Inclinação</th></tr>
+    <tr><td>1 (para o Paraíso)</td><td class="num">2.894 px</td><td class="num">≈ 63 m</td><td>≈ 100 m antes do MASP</td><td class="num">18° abaixo do horizonte</td></tr>
+    <tr><td>2 (para a Consolação)</td><td class="num">1.629 px</td><td class="num">≈ 18 m</td><td>junto à ponta sudeste do MASP</td><td class="num">13° abaixo do horizonte</td></tr>
+  </table>
+  <p><b>Verificações independentes:</b> na vista 1, a borda da multidão junto ao MASP cai a 2,7 m do eixo de referência, onde fica o
+    meio-fio na ortofoto (2 m), e as ruas Plínio Figueiredo e Casa Branca caem nas duas pontas do MASP. A frente e a traseira do
+    caminhão medidas na foto distam 17,6 m, contra 19,7 m da placa. Na vista 2, a linha a 8 m do eixo acompanha a base da fachada do
+    MASP, e a câmera está na altura do topo do MASP, que de fato aparece quase de perfil, junto ao horizonte.</p>
+  <figure><img src="paulista-2026-10-11/cam10_grade.jpg" alt="Vista 1 com meios-fios e ruas transversais projetados" loading="lazy">
+    <figcaption>Vista 1: meios-fios (amarelo), limites das calçadas (azul) e ruas transversais (magenta) desenhados na perspectiva da foto
+      pelo modelo de câmera. A multidão segue até perto da Rua 13 de Maio, no fim visível da avenida.</figcaption></figure>
+  <figure><img src="paulista-2026-10-11/cam27_grade.jpg" alt="Vista 2 com meios-fios e ruas transversais projetados" loading="lazy">
+    <figcaption>Vista 2: no sentido da Consolação, a multidão é visível até perto da Augusta e da Consolação, já no horizonte.</figcaption></figure>
+  <p>Com os dois modelos, as 6 fotos (as demais herdam o modelo pela homografia do registro) foram projetadas sobre o mapa e recortadas
+    às zonas da avenida. Abaixo, a Paulista "endireitada" da Consolação (esquerda) ao Paraíso (direita), com a ortofoto ao fundo:</p>
+  <figure><img src="paulista-2026-10-11/avenida-projetada.jpg" alt="Ortomosaico da Avenida Paulista endireitado" loading="lazy" style="width:100%">
+    <figcaption>Ortomosaico de toda a extensão (régua em metros ao longo da linha central). Entre ≈900 e ≈1.450 m, junto ao MASP, a projeção tem
+      boa resolução: dá para ver a multidão, a bandeira e as árvores do Trianon. Fora desse trecho, a imagem fica cada vez mais "esticada":
+      mostra que <b>há gente</b> desde a Augusta até além do Brigadeiro, mas não permite medir densidade. Fotos: Ricardo Stuckert/Lula Oficial
+      (CC BY-SA 4.0); ortofoto: Prefeitura de São Paulo/GeoSampa (CC BY-SA 4.0).</figcaption></figure>
+  <div class="explica"><b>O que isso muda na estimativa?</b> A projeção <b>confirma a extensão</b> adotada nas zonas: há ocupação contínua do
+    núcleo até as pontas, nas duas direções. Ela também mostra onde as fotos têm detalhe suficiente para contar pessoas, que é só
+    o entorno do MASP. Para medir densidade em toda a avenida, seriam necessárias fotos verticais em alta resolução ao longo dela.</div>
+  <h2><span class="passo-num">4</span>Área: medida no OpenStreetMap</h2>
   <ul>
     <li><b>Comprimento</b>: o eixo da avenida tem 2.745 m no OpenStreetMap, com os cruzamentos localizados pelo próprio mapa
       (Consolação a 165 m, Augusta a 559 m, MASP a ≈1.150 m, Joaquim Eugênio de Lima a 1.863 m, Brigadeiro a 2.110 m).</li>
@@ -76,7 +116,7 @@
   </ul>
   <p>Dividimos a avenida em 6 zonas, do núcleo (MASP ± 250 m) às pontas, totalizando 114.856 m² entre a Consolação e o Paraíso.</p>
 
-  <h2><span class="passo-num">4</span>Densidade: o que deu e o que não deu para medir</h2>
+  <h2><span class="passo-num">5</span>Densidade: o que deu e o que não deu para medir</h2>
   <p>O plano ideal era medir a densidade em amostras, usando como referência o carro de som, que exibe a placa
     <b>"LARGURA 3,00 m · COMPRIMENTO 19,70 m"</b>. A largura de 3,0 m corresponde a ≈119 pixels na foto, ou seja, ≈40 px por metro.
     Isso funcionou para a escala. A contagem é que falhou:</p>
@@ -109,7 +149,7 @@
     <tr><td>Brigadeiro → Paraíso</td><td class="num">27.353</td><td class="num">0 · 0,6 · 1,5</td><td>no limite do horizonte, pode estar vazia</td></tr>
   </table>
 
-  <h2><span class="passo-num">5</span>Resultado e incerteza</h2>
+  <h2><span class="passo-num">6</span>Resultado e incerteza</h2>
   <div class="formula">Estimativa pontual = Σ área × densidade provável ≈ 191 mil pessoas
 
 Monte Carlo (20.000 simulações, semente 2026):
@@ -147,6 +187,8 @@ Monte Carlo (20.000 simulações, semente 2026):
   <ol>
     <li>Abra o <a href="../?relatorio=casos/paulista-2026-10-11/relatorio.json">relatório na ferramenta</a> e altere qualquer largura ou densidade.</li>
     <li>Carregue as "fotos de exemplo" na etapa 1 e rode o registro e a IA no seu navegador.</li>
+    <li>Na etapa "Projeção no mapa", os pares de controle deste estudo já vêm no relatório. Escolha 0,3 px/m, marque "recortar às zonas"
+      e gere o ortomosaico. Você também pode apagar os pares e marcar os seus sobre a ortofoto.</li>
     <li>Confira os scripts em <a href="https://github.com/fzampirolli/conta-multidao/tree/main/python">python/</a>
       (coleta com proveniência, registro e exportação do modelo).</li>
   </ol>

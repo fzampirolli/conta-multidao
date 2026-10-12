@@ -1,0 +1,5 @@
+{"foto":"dl/img/55582830431.jpg","v1":[457.7,77.7],"v3":[584.2,9875.7],
+ "ref_px":[462,1445],"ref_largura_px":62,"ref_m":3.0,
+ "anc_px":[222,1705],"anc_st":[1100,7.5],"sentido":1,
+ "checar":{"borda esq multidão y=1100":[384,1100],"borda esq y=500":[427,500],"MASP fim (chão?) ":[300,1010],"FIESP base":[560,640],"caminhão":[462,1445]},
+ "saida":"cam10_H.json","faixa":"faixa_950_1750.jpg","faixa_s0":950,"sobreposicao":"cam10_ov.jpg"}

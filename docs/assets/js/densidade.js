@@ -14,7 +14,12 @@ let ref = [], poli = [], poliFechado = false, cabecas = [], ia = null, calor = n
 const $ = (id) => document.getElementById(id);
 const dica = (t) => ($("den-dica").textContent = t);
 
+/** Metros por pixel, se a imagem já estiver em escala (ortomosaico). */
+const mppAtual = () => (imgId === "orto" ? estado.ortomosaico?.metrosPorPixel : null);
+
 function H() {
+  const mpp = mppAtual();
+  if (mpp) return [mpp, 0, 0, 0, mpp, 0, 0, 0, 1]; // ortomosaico: escala uniforme, sem perspectiva
   if (ref.length < 4) return null;
   const w = +$("ref-larg").value, l = +$("ref-comp").value;
   try { return homografia4(ref, [[0, 0], [w, 0], [w, l], [0, l]]); } catch { return null; }
@@ -41,7 +46,7 @@ function desenhar() {
   const P = (p) => [p[0] * esc, p[1] * esc];
   // Grade do chão (mostra a perspectiva "desentortada"): linhas a cada 1 m dentro/ao redor do retângulo
   const h = H();
-  if (h) {
+  if (h && !mppAtual()) {
     const inv = inverter(h), w = +$("ref-larg").value, l = +$("ref-comp").value;
     g.strokeStyle = "rgba(255,255,255,.35)"; g.lineWidth = 1;
     const ext = 6;
@@ -177,8 +182,8 @@ function salvar() {
   const metodo = nDentro > 0 ? "manual" : "ia";
   const n = nDentro > 0 ? nDentro : iaAmostra;
   estado.amostras.push({
-    id: novoId("a"), imagemId: imgId, imagem: f ? f.nome : estado.mosaicos.find((m) => m.id === imgId)?.nome, hashImagem: f?.hash || null,
-    referencia: { pontos: ref.map((p) => p.map((v) => +v.toFixed(1))), largura: +$("ref-larg").value, comprimento: +$("ref-comp").value },
+    id: novoId("a"), imagemId: imgId, imagem: f ? f.nome : imgId === "orto" ? estado.ortomosaico.nome : estado.mosaicos.find((m) => m.id === imgId)?.nome, hashImagem: f?.hash || null,
+    referencia: mppAtual() ? { ortomosaico: true, metrosPorPixel: mppAtual() } : { pontos: ref.map((p) => p.map((v) => +v.toFixed(1))), largura: +$("ref-larg").value, comprimento: +$("ref-comp").value },
     poligono: poli.map((p) => p.map((v) => +v.toFixed(1))), areaM2: +a.toFixed(2),
     cabecas: nDentro, posicoesCabecas: cabecas.filter((p) => dentro(p[0], p[1], poli)).map((p) => p.map((v) => +v.toFixed(1))),
     contagemIA: iaAmostra != null ? +iaAmostra.toFixed(1) : null, metodo, densidade: +(n / a).toFixed(3),
@@ -203,7 +208,9 @@ function trocarImagem() {
   imgId = $("den-imagem").value || null;
   ref = []; poli = []; poliFechado = false; cabecas = []; ia = null; calor = null;
   $("ia-foto-inteira").innerHTML = "";
-  selecionar("ref"); desenhar();
+  if (mppAtual()) { selecionar("amostra"); dica(`O ortomosaico já está em escala (${mppAtual().toFixed(2)} m por pixel): desenhe direto o trecho da amostra.`); }
+  else selecionar("ref");
+  desenhar();
 }
 
 export function iniciarDensidade() {
@@ -213,7 +220,7 @@ export function iniciarDensidade() {
     sel.innerHTML = imagensDisponiveis().map((i) => `<option value="${i.id}">${i.nome}</option>`).join("");
     if ([...sel.options].some((o) => o.value === atual)) sel.value = atual; else trocarImagem();
   };
-  ouvir("fotos", opcoes); ouvir("mosaico", opcoes); ouvir("importado", listar);
+  ouvir("fotos", opcoes); ouvir("mosaico", opcoes); ouvir("ortomosaico", opcoes); ouvir("importado", listar);
   sel.onchange = trocarImagem;
   document.querySelectorAll("[data-ferr]").forEach((b) => (b.onclick = () => selecionar(b.dataset.ferr)));
   $("den-ia").onclick = rodarIA;

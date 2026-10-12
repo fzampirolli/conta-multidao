@@ -182,3 +182,10 @@ footer .conteudo { max-width: 1180px; margin: auto; }
 }
 #lista-zonas input[type=number] { width: 4.6em; padding: .25rem .35rem; }
 #lista-zonas select { margin: .2rem 0; }
+
+.grade-projecao { display: grid; grid-template-columns: 1fr 1fr; gap: .8rem; }
+.grade-projecao .area-trabalho, #proj-mapa { height: 560px; max-height: 70vh; }
+#proj-mapa { border-radius: 10px; border: 1px solid var(--borda); }
+@media (max-width: 900px) { .grade-projecao { grid-template-columns: 1fr; } }
+.leaflet-tooltip.rotulo-par { background: #ffd23f; border: 0; font-weight: 700; padding: 0 4px; box-shadow: none; }
+.rolagem { max-height: 320px; overflow: auto; }
