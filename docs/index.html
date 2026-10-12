@@ -172,8 +172,8 @@
         <h3>Ortomosaico</h3>
         <div class="barra">
           <label>Resolução: <select id="proj-res" style="width:auto"><option value="0.2">0,2 m/px</option><option value="0.3" selected>0,3 m/px</option><option value="0.5">0,5 m/px</option><option value="1">1 m/px</option></select></label>
-          <label>Descartar onde a foto tem menos de <select id="proj-min" style="width:auto"><option value="0.3">0,3 (toda a extensão visível)</option><option value="0.7">0,7</option><option value="1.5">1,5</option><option value="3" selected>3</option><option value="6">6</option></select> pixels por metro</label>
-          <label><input type="checkbox" id="proj-recorte"> recortar às zonas desenhadas (etapa 4)</label>
+          <label>Descartar onde a foto tem menos de <select id="proj-min" style="width:auto"><option value="0.3" selected>0,3 (toda a extensão visível)</option><option value="0.7">0,7</option><option value="1.5">1,5</option><option value="3">3 (só onde há detalhe)</option><option value="6">6</option></select> pixels por metro</label>
+          <label title="Sem recorte, prédios e árvores aparecem deitados para fora da avenida"><input type="checkbox" id="proj-recorte" checked> recortar às zonas desenhadas (etapa 4)</label>
           <button class="primario" id="proj-gerar">Gerar ortomosaico</button>
           <button id="proj-baixar" disabled>Baixar PNG</button>
           <label>Mostrar: <select id="proj-camada" style="width:auto"><option value="fotos">fotos projetadas</option><option value="resolucao">mapa de resolução (px/m)</option></select></label>
