@@ -42,7 +42,7 @@ code, .mono { font-family: var(--mono); font-size: .9em; }
 
 /* ---------- Topo ---------- */
 .topo {
-  position: sticky; top: 0; z-index: 1000; backdrop-filter: blur(8px);
+  position: sticky; top: 0; z-index: 1100; /* acima dos controles do Leaflet (1000) */ backdrop-filter: blur(8px);
   background: color-mix(in srgb, var(--fundo) 85%, transparent);
   border-bottom: 1px solid var(--borda);
 }
@@ -185,6 +185,9 @@ footer .conteudo { max-width: 1180px; margin: auto; }
 #lista-zonas select { margin: .2rem 0; }
 
 .grade-projecao { display: grid; grid-template-columns: 3fr 2fr; gap: .8rem; }
+/* foto + mapa usam a largura da janela, além do limite de 1180 px do texto */
+@media (min-width: 1240px) { .grade-projecao { width: calc(100vw - 2rem); margin-left: calc(50% - 50vw + 1rem); } }
+#proj-trabalho:fullscreen .grade-projecao { width: auto; margin-left: 0; }
 .grade-projecao .area-trabalho, #proj-mapa { height: calc(100vh - 160px); min-height: 420px; max-height: none; }
 .grade-projecao .area-trabalho { display: flex; }
 .grade-projecao .area-trabalho canvas { margin: auto; } /* centraliza sem cortar quando há zoom */
