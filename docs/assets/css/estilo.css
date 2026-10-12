@@ -184,10 +184,15 @@ footer .conteudo { max-width: 1180px; margin: auto; }
 #lista-zonas input[type=number] { width: 4.6em; padding: .25rem .35rem; }
 #lista-zonas select { margin: .2rem 0; }
 
-.grade-projecao { display: grid; grid-template-columns: 1fr 1fr; gap: .8rem; }
-.grade-projecao .area-trabalho, #proj-mapa { height: 560px; max-height: 70vh; }
+.grade-projecao { display: grid; grid-template-columns: 3fr 2fr; gap: .8rem; }
+.grade-projecao .area-trabalho, #proj-mapa { height: calc(100vh - 160px); min-height: 420px; max-height: none; }
+.grade-projecao .area-trabalho { display: flex; }
+.grade-projecao .area-trabalho canvas { margin: auto; } /* centraliza sem cortar quando há zoom */
+#proj-trabalho:fullscreen { background: var(--fundo); padding: .6rem; display: flex; flex-direction: column; }
+#proj-trabalho:fullscreen .grade-projecao { flex: 1; min-height: 0; }
+#proj-trabalho:fullscreen .grade-projecao .area-trabalho, #proj-trabalho:fullscreen #proj-mapa { height: 100%; min-height: 0; }
 #proj-mapa { border-radius: 10px; border: 1px solid var(--borda); }
-@media (max-width: 900px) { .grade-projecao { grid-template-columns: 1fr; } }
+@media (max-width: 900px) { .grade-projecao { grid-template-columns: 1fr; } .grade-projecao .area-trabalho, #proj-mapa { height: 60vh; } }
 .leaflet-tooltip.rotulo-par { background: #ffd23f; border: 0; font-weight: 700; padding: 0 4px; box-shadow: none; }
 .rolagem { max-height: 320px; overflow: auto; }
 .area-trabalho.vazia { min-height: 160px; display: grid; place-items: center; background: var(--fundo); border: 2px dashed var(--borda); }

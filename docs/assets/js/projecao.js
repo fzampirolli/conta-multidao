@@ -41,7 +41,8 @@ function desenharFoto() {
   $("proj-area").classList.toggle("vazia", !fotoAtual);
   if (!fotoAtual) { c.width = 10; c.height = 10; return; }
   const img = fotoAtual.img, W = img.naturalWidth, H = img.naturalHeight;
-  esc = Math.min(1, ($("proj-area").clientWidth || 600) / W) * zoom;
+  const area = $("proj-area"); // a foto inteira cabe no quadro (largura e altura); o zoom amplia a partir daí
+  esc = Math.min(1, (area.clientWidth || 600) / W, (area.clientHeight || 560) / H) * zoom;
   c.width = Math.round(W * esc); c.height = Math.round(H * esc);
   g.drawImage(img, 0, 0, c.width, c.height);
   const gr = geo(fotoAtual);
@@ -226,12 +227,18 @@ function legendaResolucao() {
 
 function mostrarResolucaoNoCursor(e) {
   const m = estado.ortomosaico;
-  if (!m?.resolucao || $("proj-camada").value !== "resolucao") return;
+  if (!m?.resolucao || $("proj-camada").value !== "resolucao") { fecharDicaResolucao(); return; }
   const [gx, gy] = sistema().paraMetros([e.latlng.lat, e.latlng.lng]);
   const i = Math.floor((gx - m.X0) / m.metrosPorPixel), j = Math.floor((m.Y1 - gy) / m.metrosPorPixel);
   const s = i >= 0 && j >= 0 && i < m.largura && j < m.altura ? m.resolucao[j * m.largura + i] : 0;
-  if (!s) { mapa.closeTooltip(); return; }
-  mapa.openTooltip(`${fmt(s, 1)} px/m · uma pessoa (0,5 m) ≈ ${fmt(s / 2, 1)} px`, e.latlng, { direction: "top", offset: [0, -8] });
+  if (!s) { fecharDicaResolucao(); return; }
+  dicaResolucao ||= L.tooltip({ direction: "top", offset: [0, -8] });
+  dicaResolucao.setLatLng(e.latlng).setContent(`${fmt(s, 1)} px/m · uma pessoa (0,5 m) ≈ ${fmt(s / 2, 1)} px`);
+  if (!mapa.hasLayer(dicaResolucao)) dicaResolucao.addTo(mapa);
+}
+let dicaResolucao = null;
+function fecharDicaResolucao() {
+  if (dicaResolucao && mapa.hasLayer(dicaResolucao)) mapa.removeLayer(dicaResolucao);
 }
 
 function mostrarMosaicoNoMapa() {
@@ -315,7 +322,7 @@ function trocarFoto() {
   pendente = null; desenharFoto(); desenharMapa();
   const gr = fotoAtual && geo(fotoAtual);
   enquadrar();
-  dica(fotoAtual ? "Clique num ponto do CHÃO na foto (canto de faixa de pedestres, base de poste, quina de calçada) e depois no mesmo ponto no mapa." : "Envie fotos na etapa 1.");
+  dica(fotoAtual ? "Clique num ponto do CHÃO na foto (canto de faixa de pedestres, base de poste, quina de calçada) e depois no mesmo ponto no mapa. Use a roda do mouse para ampliar a foto." : "Envie fotos na etapa 1.");
 }
 
 export function projecaoVisivel() {
@@ -331,6 +338,16 @@ export function iniciarProjecao() {
   mapa.on("click", cliqueMapa);
   cv().addEventListener("click", cliqueFoto);
   cv().addEventListener("mousemove", moverFoto);
+  // Roda do mouse: zoom na foto mantendo fixo o ponto sob o cursor
+  cv().addEventListener("wheel", (e) => {
+    if (!fotoAtual) return;
+    e.preventDefault();
+    const area = $("proj-area"), p = pontoDoMouse(e), r = area.getBoundingClientRect();
+    zoom = Math.max(1, Math.min(8, zoom * (e.deltaY < 0 ? 1.25 : 0.8)));
+    desenharFoto();
+    area.scrollLeft = cv().offsetLeft + p[0] * esc - (e.clientX - r.left);
+    area.scrollTop = cv().offsetTop + p[1] * esc - (e.clientY - r.top);
+  }, { passive: false });
   const sel = $("proj-foto");
   const opcoes = () => {
     const atual = sel.value;
@@ -353,7 +370,7 @@ export function iniciarProjecao() {
   $("proj-opac").oninput = () => camadaMosaico?.setOpacity(+$("proj-opac").value);
   $("proj-camada").onchange = mostrarMosaicoNoMapa;
   mapa.on("mousemove", mostrarResolucaoNoCursor);
-  mapa.on("mouseout", () => mapa.closeTooltip());
+  mapa.on("mouseout", fecharDicaResolucao);
   $("proj-gerar").onclick = async () => {
     const b = $("proj-gerar"); b.disabled = true;
     try {
@@ -370,5 +387,10 @@ export function iniciarProjecao() {
     const a = document.createElement("a"); a.download = "ortomosaico.png"; a.href = estado.ortomosaico.canvas.toDataURL("image/png"); a.click();
   };
   window.addEventListener("resize", () => fotoAtual && desenharFoto());
+  $("proj-tela").onclick = () => (document.fullscreenElement ? document.exitFullscreen() : $("proj-trabalho").requestFullscreen());
+  document.addEventListener("fullscreenchange", () => {
+    $("proj-tela").textContent = document.fullscreenElement ? "Sair da tela cheia" : "⛶ Tela cheia";
+    setTimeout(() => { mapa.invalidateSize(); desenharFoto(); }, 100);
+  });
   return mapa;
 }
