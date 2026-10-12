@@ -178,9 +178,15 @@ cv.addEventListener("click", (e) => {
   if (!imgId) return;
   const p = pontoDoClique(e);
   const perto = (q, px = 10) => Math.hypot((q[0] - p[0]) * esc, (q[1] - p[1]) * esc) < px;
-  if (ferr === "grade") {
+  // Com uma grade na foto, clicar FORA dela move a grade para lá; clicar dentro marca cabeças.
+  const moverGrade = ferr === "grade" || (ferr === "cabecas" && grade && !dentro(p[0], p[1], poli));
+  if (moverGrade) {
     aplicarGrade(p);
-    if (grade) { selecionar("cabecas"); dica(`Grade de ${fmt(grade.larg * grade.prof)} m² posicionada. Clique em cada cabeça: cada célula mostra quantas pessoas tem. Para mover a grade, use ⑤ de novo.`); }
+    if (grade) {
+      selecionar("cabecas");
+      const n = cabecas.filter((q) => dentro(q[0], q[1], poli)).length;
+      dica(`Grade de ${fmt(grade.larg * grade.prof)} m² posicionada${n ? ` (${n} cabeças já marcadas dentro dela)` : ""}. Clique em cada cabeça dentro da grade; clique fora dela para mudar a grade de lugar.`);
+    }
   } else if (ferr === "ref") {
     if (ref.length >= 4) ref = [];
     ref.push(p);
