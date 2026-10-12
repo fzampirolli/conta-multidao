@@ -173,11 +173,13 @@ async function rodarIA() {
   try {
     ia = await contarIA(f, 2048, imgId, prog, dica);
     calor = mapaDeCalor(ia);
-    dica(`IA: ${fmt(ia.total)} pessoas detectadas na imagem inteira.`);
+    dica(`IA: ${fmt(ia.total)} pessoas visíveis nesta foto. Não é o total do evento: o total sai da etapa 6 (área × densidade).`);
     $("ia-foto-inteira").innerHTML = `
-      <div class="aviso"><b>IA na imagem inteira: ${fmt(ia.total)} pessoas visíveis.</b><br>
-      Em fotos panorâmicas, cabeças distantes ficam com poucos pixels e a IA tende a <b>subcontar</b>.
-      Use a IA para medir a <b>densidade numa amostra próxima</b>, não para o total.
+      <div class="aviso"><b>IA: ${fmt(ia.total)} pessoas visíveis nesta foto.</b>
+      <b>Este não é o total do evento.</b> O total sai da etapa 6: área de cada zona no mapa × densidade dela.<br>
+      Por quê: a foto mostra só uma parte do evento; longe da câmera as cabeças têm poucos pixels e a IA <b>subconta</b>;
+      e somar fotos diferentes contaria duas vezes os trechos que aparecem em mais de uma.
+      Use a IA para medir a <b>densidade numa amostra próxima</b> da câmera (desenhe a amostra e veja "contagem IA na amostra").
       <div class="grupo-botoes"><button id="teste-escala">Fazer teste de escala</button></div>
       <div id="res-escala"></div></div>`;
     $("teste-escala").onclick = testeEscala;
