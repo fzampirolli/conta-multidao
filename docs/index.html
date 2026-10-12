@@ -73,6 +73,8 @@
       <button data-etapa="area">Área no mapa</button>
       <button data-etapa="densidade">Densidade nas fotos</button>
       <button data-etapa="resultado">Resultado</button>
+      <label class="largura" title="Largura das áreas de trabalho, em todas as abas">Largura:
+        <select id="largura-trabalho"><option value="normal">normal</option><option value="larga">larga</option><option value="janela">janela inteira</option></select></label>
     </nav>
 
     <!-- 1. FOTOS -->
@@ -163,7 +165,7 @@
         <p class="pequeno suave">Atalhos: roda do mouse amplia a foto · arraste um ponto (na foto ou no mapa) para corrigi-lo ·
           <kbd>Ctrl</kbd> + clique marca vários pontos na foto de uma vez (depois clique no mapa na mesma ordem) ·
           <kbd>Enter</kbd> confirma o marcador rosa · <kbd>Esc</kbd> cancela os pontos pendentes · <kbd>Backspace</kbd> ou <kbd>Ctrl+Z</kbd> desfaz o último par · <kbd>Ctrl+Y</kbd> refaz</p>
-        <div class="grade-projecao">
+        <div class="grade-projecao" data-divisivel="projecao" data-padrao="0.6">
           <div class="area-trabalho vazia" id="proj-area"><canvas id="proj-canvas" width="10" height="10"></canvas></div>
           <div id="proj-mapa"></div>
         </div>
@@ -195,7 +197,7 @@
 
     <!-- 4. ÁREA -->
     <div class="painel" id="painel-area">
-      <div class="duas-colunas">
+      <div class="duas-colunas" data-divisivel="area" data-padrao="0.72">
         <div class="cartao">
           <h2>4. Desenhe no mapa a área ocupada</h2>
           <div class="barra">
@@ -254,7 +256,7 @@
           <label><input type="checkbox" id="den-mapa-calor" checked> mapa de calor</label>
         </div>
         <div class="progresso"><div id="den-prog"></div></div>
-        <div class="duas-colunas">
+        <div class="duas-colunas" data-divisivel="densidade" data-padrao="0.68">
           <div class="area-trabalho vazia" id="den-area"><canvas id="den-canvas" width="10" height="10"></canvas></div>
           <div>
             <div class="kpis" style="grid-template-columns:1fr 1fr">

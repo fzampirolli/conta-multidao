@@ -7,8 +7,10 @@ import { iniciarArea, mapaVisivel } from "./area.js";
 import { iniciarDensidade } from "./densidade.js";
 import { iniciarResultado, desenharResultado } from "./resultado.js";
 import { desenharGuia } from "./densidades.js";
+import { iniciarLargura } from "./largura.js";
 
 carregarLocal();
+iniciarLargura();
 iniciarFotos();
 iniciarRegistro();
 iniciarProjecao();

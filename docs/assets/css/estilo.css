@@ -184,10 +184,7 @@ footer .conteudo { max-width: 1180px; margin: auto; }
 #lista-zonas input[type=number] { width: 4.6em; padding: .25rem .35rem; }
 #lista-zonas select { margin: .2rem 0; }
 
-.grade-projecao { display: grid; grid-template-columns: 3fr 2fr; gap: .8rem; }
-/* foto + mapa usam a largura da janela, além do limite de 1180 px do texto */
-@media (min-width: 1240px) { .grade-projecao { width: calc(100vw - 2rem); margin-left: calc(50% - 50vw + 1rem); } }
-#proj-trabalho:fullscreen .grade-projecao { width: auto; margin-left: 0; }
+.grade-projecao { display: grid; gap: .8rem; }
 .grade-projecao .area-trabalho, #proj-mapa { height: calc(100vh - 160px); min-height: 420px; max-height: none; }
 .grade-projecao .area-trabalho { display: flex; }
 .grade-projecao .area-trabalho canvas { margin: auto; } /* centraliza sem cortar quando há zoom */
@@ -207,3 +204,17 @@ footer .conteudo { max-width: 1180px; margin: auto; }
 .marca-par { background: #ffd23f; border: 2px solid #111; border-radius: 50%; cursor: move; box-sizing: border-box; }
 .marca-par.prevista { background: #ff3f8e; border-color: #fff; box-shadow: 0 0 0 2px #ff3f8e; }
 kbd { font: .8em ui-monospace, monospace; border: 1px solid var(--borda); border-bottom-width: 2px; border-radius: 4px; padding: 0 .3em; }
+
+/* ---------- Padrão de largura (todas as abas) ---------- */
+:root[data-largura="larga"] main { max-width: 1600px; }
+:root[data-largura="janela"] main { max-width: none; }
+.etapas .largura { margin-left: auto; display: flex; align-items: center; gap: .4rem; font-size: .9rem; color: var(--suave); }
+.etapas .largura select { width: auto; }
+/* Duas colunas com divisor arrastável; --f é a fração da coluna da esquerda */
+[data-divisivel] { display: grid; grid-template-columns: minmax(0, calc(var(--f, .5) * 100% - 9px)) 10px minmax(0, 1fr); gap: 0 .4rem; }
+.divisor { cursor: col-resize; touch-action: none; align-self: stretch; min-height: 60px; border-radius: 5px; position: relative;
+  background: linear-gradient(var(--borda), var(--borda)) center / 2px 100% no-repeat; }
+.divisor::after { content: "⋮"; position: absolute; top: min(50%, 40vh); left: 50%; transform: translate(-50%, -50%); color: var(--suave);
+  background: var(--cartao); border: 1px solid var(--borda); border-radius: 4px; padding: .3rem 0; line-height: 1; }
+.divisor:hover, .divisor.ativo { background: linear-gradient(var(--acento), var(--acento)) center / 4px 100% no-repeat; }
+@media (max-width: 900px) { [data-divisivel] { grid-template-columns: 1fr; gap: 1rem; } .divisor { display: none; } }
