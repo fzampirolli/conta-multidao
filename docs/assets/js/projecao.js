@@ -157,8 +157,13 @@ export async function gerarOrtomosaico(mpp = 0.3, pxPorMetroMin = 3, progresso, 
     mascara = new Uint8Array(W * Ht);
     for (let i = 0; i < mascara.length; i++) mascara[i] = md[4 * i + 3] > 0;
   }
+  // Origem: cada foto pertence a uma "vista" (um mosaico da etapa 2, ou ela sozinha se não entrou em mosaico).
+  // dono = vista que forneceu o pixel (a de melhor resolução); cobertura = conjunto de vistas que veem o pixel.
+  const vistas = vistasDasFotos(validos.map((it) => it.f));
+  const dono = new Uint8Array(W * Ht), cobertura = new Uint32Array(W * Ht);
   let k = 0;
   for (const it of validos) {
+    const vista = vistas.daFoto.get(it.f.id), bit = 1 << (vista % 32);
     const img = it.f.img, iw = img.naturalWidth, ih = img.naturalHeight;
     const tmp = document.createElement("canvas"); tmp.width = iw; tmp.height = ih;
     const tg = tmp.getContext("2d", { willReadFrequently: true }); tg.drawImage(img, 0, 0);
@@ -174,16 +179,18 @@ export async function gerarOrtomosaico(mpp = 0.3, pxPorMetroMin = 3, progresso, 
         if (w2 <= 0) continue;
         const s = Math.sqrt(it.detHi / (w2 * w2 * w2)); // pixels da foto por metro de chão
         const o = j * W + i;
-        if (s < pxPorMetroMin || s <= melhor[o] || (mascara && !mascara[o])) continue;
+        if (s < pxPorMetroMin || (mascara && !mascara[o])) continue;
         const u = (Hi[0] * gx + Hi[1] * gy + Hi[2]) / w2, v = (Hi[3] * gx + Hi[4] * gy + Hi[5]) / w2;
         if (u < 0 || v < 0 || u >= iw - 1 || v >= ih - 1) continue;
+        cobertura[o] |= bit;
+        if (s <= melhor[o]) continue;
         const ux = u | 0, vy = v | 0, fx = u - ux, fy = v - vy, b = 4 * (vy * iw + ux);
         for (let c = 0; c < 3; c++) {
           const a = px[b + c] * (1 - fx) + px[b + 4 + c] * fx;
           const d = px[b + 4 * iw + c] * (1 - fx) + px[b + 4 * iw + 4 + c] * fx;
           dados[4 * o + c] = a * (1 - fy) + d * fy;
         }
-        dados[4 * o + 3] = 255; melhor[o] = s;
+        dados[4 * o + 3] = 255; melhor[o] = s; dono[o] = vista + 1;
       }
       if (j % 64 === 0) { progresso?.((k + (j - j0) / (j1 - j0 || 1)) / validos.length); await new Promise((r) => setTimeout(r)); }
     }
@@ -194,8 +201,57 @@ export async function gerarOrtomosaico(mpp = 0.3, pxPorMetroMin = 3, progresso, 
   const bounds = [S.paraLatLon([X0, Y0]), S.paraLatLon([X1, Y1])];
   estado.ortomosaico = { id: "orto", nome: `Ortomosaico (${validos.length} fotos, ${mpp.toFixed(2)} m/px)`, canvas, bounds,
     metrosPorPixel: mpp, largura: W, altura: Ht, fotos: validos.map((it) => it.f.nome), pxPorMetroMin, recortado: !!mascara,
-    ...mapaResolucao(melhor, W, Ht, mpp), resolucao: melhor, X0, Y1 };
+    ...mapaResolucao(melhor, W, Ht, mpp), resolucao: melhor, X0, Y1,
+    ...mapaOrigem(dono, cobertura, W, Ht, mpp, vistas.nomes), dono, cobertura };
   return estado.ortomosaico;
+}
+
+// ---------- Mapa de origem (de qual vista veio cada trecho do chão) ----------
+// Paleta categórica de Okabe e Ito, legível por pessoas com daltonismo.
+const CORES_VISTA = [[230, 159, 0], [86, 180, 233], [0, 158, 115], [204, 121, 167], [0, 114, 178], [213, 94, 0], [240, 228, 66], [120, 120, 120]];
+const corVista = (v) => CORES_VISTA[v % CORES_VISTA.length];
+
+/** Agrupa as fotos em vistas: cada mosaico da etapa 2 é uma vista; foto fora de mosaico é uma vista sozinha. */
+function vistasDasFotos(fotos) {
+  const daFoto = new Map(), nomes = [], num = (f) => estado.fotos.indexOf(f) + 1;
+  for (const m of estado.mosaicos || []) {
+    const ids = m.transformacoes.map((t) => t.id).filter((id) => fotos.some((f) => f.id === id));
+    if (!ids.length) continue;
+    ids.forEach((id) => daFoto.set(id, nomes.length));
+    nomes.push(`${m.nome.split(" (")[0]} (fotos ${ids.map((id) => num(fotos.find((f) => f.id === id))).join(", ")})`);
+  }
+  for (const f of fotos) if (!daFoto.has(f.id)) { daFoto.set(f.id, nomes.length); nomes.push(`Foto ${num(f)} (${f.nome.split("/").pop()})`); }
+  return { daFoto, nomes };
+}
+
+function mapaOrigem(dono, cobertura, W, Ht, mpp, nomes) {
+  const img = new ImageData(W, Ht), d = img.data, area = nomes.map(() => 0), vista = nomes.map(() => 0);
+  let sobreposta = 0;
+  for (let o = 0; o < dono.length; o++) {
+    if (!dono[o]) continue;
+    const c = cobertura[o], v = dono[o] - 1, dupla = (c & (c - 1)) !== 0; // mais de um bit: vista por 2+ vistas
+    area[v] += mpp * mpp;
+    for (let b = 0; b < nomes.length; b++) if (c & (1 << (b % 32))) vista[b] += mpp * mpp;
+    if (dupla) sobreposta += mpp * mpp;
+    const listra = dupla && ((o % W) + Math.floor(o / W)) % 8 < 3, [r, g, bl] = listra ? [255, 255, 255] : corVista(v);
+    d[4 * o] = r; d[4 * o + 1] = g; d[4 * o + 2] = bl; d[4 * o + 3] = 255;
+  }
+  const canvasOrigem = document.createElement("canvas"); canvasOrigem.width = W; canvasOrigem.height = Ht;
+  canvasOrigem.getContext("2d").putImageData(img, 0, 0);
+  return { canvasOrigem, vistas: nomes, areaPorVista: area.map(Math.round), areaVistaPor: vista.map(Math.round), areaSobreposta: Math.round(sobreposta) };
+}
+
+function legendaOrigem() {
+  const m = estado.ortomosaico, total = m.areaPorVista.reduce((a, b) => a + b, 0) || 1;
+  return `<table><tr><th></th><th>Vista</th><th class="num">Área que ela forneceu</th><th class="num">Área que ela enxerga</th></tr>
+    ${m.vistas.map((n, v) => `<tr><td><span class="amostra-cor" style="background:rgb(${corVista(v)})"></span></td><td>${n}</td>
+      <td class="num">${fmt(m.areaPorVista[v])} m² (${fmt(100 * m.areaPorVista[v] / total, 1)}%)</td><td class="num">${fmt(m.areaVistaPor[v])} m²</td></tr>`).join("")}
+    <tr><td><span class="amostra-cor" style="background:repeating-linear-gradient(45deg,#fff 0 3px,#999 3px 8px)"></span></td>
+      <td>Vista por mais de uma vista (listrado)</td><td class="num">${fmt(m.areaSobreposta)} m²</td><td></td></tr>
+    <tr><th></th><th>Total do chão projetado</th><th class="num">${fmt(total)} m²</th><th></th></tr></table>
+    <p class="pequeno suave">Cada ponto do chão vem de <b>uma só</b> vista, a que o mostra com mais detalhe. Os trechos listrados aparecem
+    em mais de uma vista, mas entram <b>uma vez</b> no ortomosaico, e por isso a soma da coluna "forneceu" é igual ao total.
+    A contagem final usa as zonas da etapa 4, que também não se sobrepõem. ${(estado.mosaicos || []).length ? "" : "Rode o registro (etapa 2) para agrupar as fotos de cada ponto de vista; sem ele, cada foto é uma vista."}</p>`;
 }
 
 // ---------- Mapa de resolução ----------
@@ -224,6 +280,7 @@ function mapaResolucao(melhor, W, Ht, mpp) {
 
 function legendaResolucao() {
   const m = estado.ortomosaico, el = $("proj-legenda");
+  if (m && $("proj-camada").value === "origem") { el.innerHTML = legendaOrigem(); return; }
   if (!m || $("proj-camada").value !== "resolucao") { el.innerHTML = ""; return; }
   const total = m.areaPorClasse.reduce((a, b) => a + b, 0) || 1;
   el.innerHTML = `<table><tr><th></th><th class="num">Pixels da foto por metro</th><th class="num">Área</th><th>O que dá para fazer</th></tr>
@@ -236,13 +293,19 @@ function legendaResolucao() {
 
 function mostrarResolucaoNoCursor(e) {
   const m = estado.ortomosaico;
-  if (!m?.resolucao || $("proj-camada").value !== "resolucao") { fecharDicaResolucao(); return; }
+  const camada = $("proj-camada").value;
+  if (!m?.resolucao || camada === "fotos") { fecharDicaResolucao(); return; }
   const [gx, gy] = sistema().paraMetros([e.latlng.lat, e.latlng.lng]);
   const i = Math.floor((gx - m.X0) / m.metrosPorPixel), j = Math.floor((m.Y1 - gy) / m.metrosPorPixel);
-  const s = i >= 0 && j >= 0 && i < m.largura && j < m.altura ? m.resolucao[j * m.largura + i] : 0;
+  const o = j * m.largura + i, s = i >= 0 && j >= 0 && i < m.largura && j < m.altura ? m.resolucao[o] : 0;
   if (!s) { fecharDicaResolucao(); return; }
+  let texto = `${fmt(s, 1)} px/m · uma pessoa (0,5 m) ≈ ${fmt(s / 2, 1)} px`;
+  if (camada === "origem") {
+    const outras = m.vistas.filter((_, v) => v !== m.dono[o] - 1 && m.cobertura[o] & (1 << (v % 32)));
+    texto = `Vem de: ${m.vistas[m.dono[o] - 1]} (${fmt(s, 1)} px/m)${outras.length ? `<br>Também visto por: ${outras.join("; ")}` : ""}`;
+  }
   dicaResolucao ||= L.tooltip({ direction: "top", offset: [0, -8] });
-  dicaResolucao.setLatLng(e.latlng).setContent(`${fmt(s, 1)} px/m · uma pessoa (0,5 m) ≈ ${fmt(s / 2, 1)} px`);
+  dicaResolucao.setLatLng(e.latlng).setContent(texto);
   if (!mapa.hasLayer(dicaResolucao)) dicaResolucao.addTo(mapa);
 }
 let dicaResolucao = null;
@@ -254,7 +317,7 @@ function mostrarMosaicoNoMapa() {
   if (camadaMosaico) mapa.removeLayer(camadaMosaico);
   const m = estado.ortomosaico;
   if (!m) return;
-  const c = $("proj-camada").value === "resolucao" ? m.canvasResolucao : m.canvas;
+  const c = { resolucao: m.canvasResolucao, origem: m.canvasOrigem }[$("proj-camada").value] || m.canvas;
   camadaMosaico = L.imageOverlay(c.toDataURL("image/png"), m.bounds, { opacity: +$("proj-opac").value }).addTo(mapa);
   legendaResolucao();
 }
