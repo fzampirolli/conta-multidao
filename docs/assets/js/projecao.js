@@ -152,7 +152,7 @@ function alternarMedir() {
   medindo = !medindo; medA = null;
   $("proj-medir").classList.toggle("ativo", medindo);
   if (medindo) cancelarPendente();
-  dica(medindo ? "Medir: clique numa margem da rua na foto (meio-fio, borda da calçada) e depois na margem oposta." : "Medição encerrada. Clique num ponto do chão na foto para marcar pares.");
+  dica(medindo ? "Medir: clique em dois pontos NO CHÃO na foto (meio-fios, faixas, base de pilares). Topos e fachadas de prédios não servem: a projeção os leva ao chão atrás deles." : "Medição encerrada. Clique num ponto do chão na foto para marcar pares.");
   desenharFoto(); desenharMapa();
 }
 
